@@ -21,10 +21,9 @@ class ScreenList {
 }
 
 class ScreenColor {
-  // Color? baseColor = Colors.orange[300];
-  // Color? subColor = Colors.lightBlue[300];
-  Color? subColor = Colors.blue;
-  // Color? baseColor2 = Colors.yellow[100];
-  Color? baseColor = Colors.grey[800];
+  Color? baseColor = Colors.grey[900];
   Color? baseColor2 = Colors.black;
+  // Color? baseColor2 = Colors.orange;
+  Color? baseColor3 = Colors.grey;
+  Color? subColor = Colors.blue;
 }

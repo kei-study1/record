@@ -17,7 +17,8 @@ Widget ConText(String s, double width, double fontSize) {
     child: Text(
       s,
       style: TextStyle(
-        fontSize: fontSize
+        fontSize: fontSize,
+        color: Colors.white
       )
     ),
   );

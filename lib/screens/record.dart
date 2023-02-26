@@ -35,7 +35,7 @@ class RecordState extends State<RecordStateful> {
   late DateTime? _restTime = null;
   // Tag color
   int _tagColor = 1;
-  int _tagColorCord = 0;
+  int _tagColorCord = 0xffff0000;
   // TimerUtil
   TimerUtil tu = TimerUtil();
   // Tagクラス
@@ -44,6 +44,7 @@ class RecordState extends State<RecordStateful> {
     _tagList = await Tag.getTags();
   }
   // TextField
+  final recordController = TextEditingController();
   final myController = TextEditingController();
   var _selectedvalue;
 
@@ -108,287 +109,344 @@ class RecordState extends State<RecordStateful> {
     return Container(
       height: MediaQuery.of(context).size.height,
       child: SingleChildScrollView(
-        child: Row(
+        child: Column(
           children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: Container(),
-            ),
-
-            Expanded(
-              flex: 22,
-              child: Container(
-                height: 500,
-                color: Colors.blue,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    
-                    Card(
-                      color: _buttonOn? sc.baseColor : Color.fromARGB(255, 167, 157, 133),
-                      child: Container(
-                        padding: EdgeInsets.only(left: 17, top: 8, bottom:8),
-                        width: double.infinity,
-                        child: Text(
-                          _countTimer,
-                          style: TextStyle(
-                            fontSize: 50,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-              
-                    Sb('h', 10),
-              
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        FloatingActionButton(
-                          onPressed: (){},
-                          splashColor: sc.subColor,
-                          backgroundColor: sc.baseColor,
-                          child: Icon(Icons.restart_alt, size: 40,),
-                        ),
-              
-                        FloatingActionButton(
-                          onPressed: _buttonPress,
-                          splashColor: _buttonOn ? sc.baseColor : sc.subColor,
-                          backgroundColor: _buttonOn ? sc.subColor : sc.baseColor,
-                          child: Icon(_buttonOn ? Icons.stop_circle_outlined : Icons.play_circle_outline, size: 40,),
-                        ),
-                      ],
-                    ),
-              
-                    Sb('h', 10),
-
-                    Container(
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              ConText('開始時刻：', 100, 20),
-                              ConText(
-                                (_startTime == null)? '' :
-                                tu.stringDateTime(_startTime!),
-                                150,
-                                30
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            children: <Widget>[
-                              ConText('終了時刻：', 100, 20),
-                              ConText(
-                                (_endTime == null)? '' :
-                                tu.stringDateTime(_endTime!),
-                                150,
-                                30
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            children: <Widget>[
-                              ConText('休憩時刻：', 100, 20),
-                              ConText(
-                                (_restTime == null)? '' :
-                                tu.stringDateTime(_restTime!),
-                                150,
-                                30
-                              ),
-                            ],
-                          ),
-                        ],
-                      )
-                    ),
-              
-                    Container(
-                      color: Colors.white,
-                      width: double.infinity,
-                      child: const TextField(
-                        maxLines: 4,
-                        decoration: InputDecoration(
-                          hintText: "memo",
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.orange
-                            )
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.orange
-                            )
-                          ),
-                        ),
-                      ),
-                    ),
-              
-                    Sb('h', 10),
-              
-                    Container(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: sc.baseColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
-                        ),
-                        child: Text(
-                          '登録する',
-                          style: TextStyle(
-                            fontSize: 20
-                          ),
-                        )
-                      ),
-                    ),
-              
-                  ],
+            Sb('h', 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(),
                 ),
-              ),
-            ),
 
-            Expanded(
-              flex: 1,
-              child: Container(),
-            ),
-
-            Expanded(
-              flex: 7,
-              child: Container(
-                height: 500,
-                color: Colors.red,
-                child: Column(
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return StatefulBuilder(
-                              builder: (context, dialogState) {
-                                return AlertDialog(
-                                  title: Text("教材の登録"),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      TextField(
-                                        controller: myController,
-                                        maxLength: 15,
-                                      ),
-
-                                      Text('色の登録'),
-
-                                      Row(
-                                        children: <Widget>[
-                                          // FloatingActionButton(
-                                          //   onPressed: () => tagChoice(dialogState),
-                                          //   backgroundColor: Colors.white,
-                                          //   foregroundColor: Color(0xffff0000),
-                                          //   shape: CircleBorder(
-                                          //     side: BorderSide(
-                                          //       color: (_tagColor == 1) ? Colors.blue : Colors.white,
-                                          //       width: 3,
-                                          //     )
-                                          //   ),
-                                          //   child: Icon(
-                                          //     Icons.bookmark,
-                                          //     size: 30,
-                                          //   ),
-                                          // ),
-
-                                          // TagButton(dialogState),
-                                          TagButton(dialogState, 2, 0xffff0000),
-                                          TagButton(dialogState, 3, 0xff00ff00),
-                                        ],
-                                      ),
-
-                                      ElevatedButton(
-                                        child: Text('保存'),
-                                        onPressed: () async {
-                                          Tag _tag = Tag(text: myController.text, color: 11111, visibleFlg: 1);
-                                          await Tag.insertTag(_tag);
-                                          final List<Tag> tags = await Tag.getTags();
-                                          setState(() {
-                                            _tagList = tags;
-                                            _selectedvalue = null;
-                                          });
-                                          myController.clear();
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                            
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.all(3),
-                        backgroundColor: sc.baseColor,
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          children: <Widget>[
-                            Icon(
-                              Icons.bookmark_add,
-                              size: 50,
+                Expanded(
+                  flex: 22,
+                  child: Container(
+                    // color: sc.baseColor,
+                    height: 500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        
+                        Card(
+                          color: _buttonOn? sc.baseColor : sc.baseColor2,
+                          child: Container(
+                            padding: EdgeInsets.only(left: 17, top: 8, bottom:8),
+                            width: double.infinity,
+                            child: Text(
+                              _countTimer,
+                              style: TextStyle(
+                                fontSize: 50,
+                                color: Colors.white,
+                              ),
                             ),
-                            Container(
-                              child: Text(
-                                'あああああああああああああああ',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  
-                                ),
-                              )
+                          ),
+                        ),
+                  
+                        Sb('h', 10),
+                  
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            FloatingActionButton(
+                              // なんとなくタグの全件削除を入れている。
+                              onPressed: () async {
+                                await Tag.deleteAllTag();
+                                final List<Tag> tags = await Tag.getTags();
+                                setState(() {
+                                  _tagList = tags;
+                                  _selectedvalue = null;
+                                });
+                              },
+                              // splashColor: sc.subColor,
+                              backgroundColor: Colors.red,
+                              child: Icon(Icons.restart_alt, size: 40,),
+                            ),
+                  
+                            FloatingActionButton(
+                              onPressed: _buttonPress,
+                              splashColor: _buttonOn ? sc.subColor : sc.baseColor,
+                              backgroundColor: _buttonOn ? sc.baseColor : sc.subColor,
+                              child: Icon(_buttonOn ? Icons.stop_circle_outlined : Icons.play_circle_outline, size: 40,),
                             ),
                           ],
                         ),
-                      ),
+                  
+                        Sb('h', 10),
+
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  ConText('開始時刻：', 100, 20),
+                                  ConText(
+                                    (_startTime == null)? '' :
+                                    tu.stringDateTime(_startTime!),
+                                    150,
+                                    30
+                                  ),
+                                ],
+                              ),
+
+                              Row(
+                                children: <Widget>[
+                                  ConText('終了時刻：', 100, 20),
+                                  ConText(
+                                    (_endTime == null)? '' :
+                                    tu.stringDateTime(_endTime!),
+                                    150,
+                                    30
+                                  ),
+                                ],
+                              ),
+
+                              Row(
+                                children: <Widget>[
+                                  ConText('休憩時刻：', 100, 20),
+                                  ConText(
+                                    (_restTime == null)? '' :
+                                    tu.stringDateTime(_restTime!),
+                                    150,
+                                    30
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        ),
+
+                        Sb('h', 10),
+                  
+                        Container(
+                          // color: Colors.white,
+                          width: double.infinity,
+                          child:  TextField(
+                            controller: recordController,
+                            maxLines: 4,
+                            style: TextStyle(
+                              color: Colors.white
+                            ),
+                            decoration: InputDecoration(
+                              hintText: "memo",
+                              hintStyle: TextStyle(
+                                color: Colors.white
+                              ),
+                              fillColor: sc.baseColor,
+                              filled: true,
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.white
+                                )
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: sc.subColor!
+                                )
+                              ),
+                            ),
+                          ),
+                        ),
+                  
+                        Sb('h', 10),
+                  
+                        Container(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: sc.subColor,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                            ),
+                            child: Text(
+                              '登録する',
+                              style: TextStyle(
+                                fontSize: 20
+                              ),
+                            )
+                          ),
+                        ),
+                  
+                      ],
                     ),
-                    Container(
-                      height: 300,
-                      color: Colors.yellow,
-                      child: FutureBuilder(
-                        future: initialize(),
-                        builder: (context, snapshot) {
-                          // if(snapshot.connectionState == ConnectionState.waiting) {
-                          //   // 非同期処理未完了 = 通信中
-                          //   return Center(
-                          //     child: CircularProgressIndicator(),
-                          //   );
-                          // }
-                          return ListView.builder(
-                            itemCount: _tagList.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                height: 20,
-                                color: Colors.blue,
-                                child: Text(
-                                  // '${_tagList[index].id}'
-                                  _tagList.elementAt(index).text
+                  ),
+                ),
+
+                Expanded(
+                  flex: 1,
+                  child: Container(),
+                ),
+
+                Expanded(
+                  flex: 7,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return StatefulBuilder(
+                                  builder: (context, dialogState) {
+                                    return AlertDialog(
+                                      title: Text("教材の登録"),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          TextField(
+                                            controller: myController,
+                                            maxLength: 15,
+                                          ),
+
+                                          Text('色の選択'),
+
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              TagButton(dialogState, 1, 0xffff0000),
+                                              TagButton(dialogState, 2, 0xffff007f),
+                                              TagButton(dialogState, 3, 0xffff00ff),
+                                              TagButton(dialogState, 4, 0xff7f00ff),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              TagButton(dialogState, 5, 0xff0000ff),
+                                              TagButton(dialogState, 6, 0xff007fff),
+                                              TagButton(dialogState, 7, 0xff00ffff),
+                                              TagButton(dialogState, 8, 0xff00ff7f),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              TagButton(dialogState, 9, 0xff00ff00),
+                                              TagButton(dialogState, 10, 0xff7fff00),
+                                              TagButton(dialogState, 11, 0xffffff00),
+                                              TagButton(dialogState, 12, 0xffff7f00),
+                                            ],
+                                          ),
+
+                                          ElevatedButton(
+                                            child: Text('登録'),
+                                            onPressed: () async {
+                                              Tag _tag = Tag(text: myController.text, color: _tagColorCord, visibleFlg: 1);
+                                              await Tag.insertTag(_tag);
+                                              final List<Tag> tags = await Tag.getTags();
+                                              setState(() {
+                                                _tagList = tags;
+                                                _selectedvalue = null;
+                                              });
+                                              myController.clear();
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.all(3),
+                            backgroundColor: sc.baseColor,
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            child: Column(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.bookmark_add,
+                                  size: 50,
                                 ),
+                                Container(
+                                  child: Text(
+                                    'add',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      
+                                    ),
+                                  )
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        Sb('h', 5),
+
+                        Container(
+                          height: 600,
+                          // height: MediaQuery.of(context).size.height,
+                          child: FutureBuilder(
+                            future: initialize(),
+                            builder: (context, snapshot) {
+                              // if(snapshot.connectionState == ConnectionState.waiting) {
+                              //   // 非同期処理未完了 = 通信中
+                              //   return Center(
+                              //     child: CircularProgressIndicator(),
+                              //   );
+                              // }
+                              return ListView.builder(
+                                itemCount: _tagList.length,
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: <Widget> [
+                                      ElevatedButton(
+                                        onPressed: () {},
+                                        style: ElevatedButton.styleFrom(
+                                          padding: EdgeInsets.all(3),
+                                          backgroundColor: sc.baseColor,
+                                        ),
+                                        child: Container(
+                                          width: double.infinity,
+                                          child: Column(
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.bookmark,
+                                                color: Color(_tagList[index].color),
+                                                size: 50,
+                                              ),
+                                              Container(
+                                                child: Text(
+                                                  _tagList[index].text,
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    
+                                                  ),
+                                                )
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Sb('h', 5)
+                                    ]
+
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                      ),
-                    )
+                          ),
+                        )
 
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
 
-            Expanded(
-              flex: 1,
-              child: Container(),
+                Expanded(
+                  flex: 1,
+                  child: Container(),
+                ),
+              ],
             ),
           ],
         ),

@@ -71,4 +71,10 @@ class Tag {
       conflictAlgorithm: ConflictAlgorithm.rollback,
     );
   }
+
+  // データ削除用
+  static Future<void> deleteAllTag() async {
+    final db = await database;
+    await db.rawDelete('delete from tag');
+  }
 }
