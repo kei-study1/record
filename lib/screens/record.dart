@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'screenRoot.dart';
-import 'util.dart';
+import '../db.dart';
+import '../util.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
+
 
 class Record extends ScreenRoot {
   @override
@@ -31,6 +33,9 @@ class RecordState extends State<RecordStateful> {
   late DateTime? _startTime = null;
   late DateTime? _endTime = null;
   late DateTime? _restTime = null;
+  // Tag color
+  int _tagColor = 1;
+  int _tagColorCord = 0;
   // TimerUtil
   TimerUtil tu = TimerUtil();
   // Tagクラス
@@ -70,6 +75,32 @@ class RecordState extends State<RecordStateful> {
     setState(() {
       _countTimer = tu.stringDateTime(tu.dateTimeIntSeconds(_seconds));
     });
+  }
+
+  // タグ表示用Widget
+  Widget TagButton(StateSetter dialogState, int tagNo, int tagColorCord) {
+    return FloatingActionButton(
+      // onPressed: () => tagChoice(dialogState, tagNo),
+      onPressed: () {
+        dialogState(() {
+          _tagColor = tagNo;
+          _tagColorCord = tagColorCord;
+        });
+        print('$_tagColor' + ' : ' +  '$_tagColorCord');
+      },
+      backgroundColor: Colors.white,
+      foregroundColor: Color(tagColorCord),
+      shape: CircleBorder(
+        side: BorderSide(
+          color: (_tagColor == tagNo) ? Colors.blue : Colors.white,
+          width: 3,
+        )
+      ),
+      child: Icon(
+        Icons.bookmark,
+        size: 30,
+      ),
+    );
   }
 
   @override
@@ -231,40 +262,71 @@ class RecordState extends State<RecordStateful> {
                 child: Column(
                   children: <Widget>[
                     ElevatedButton(
-
-
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: Text("新規メモ作成"),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text('なんでも入力してね'),
-                                TextField(controller: myController),
-                                ElevatedButton(
-                                  child: Text('保存'),
-                                  onPressed: () async {
-                                    Tag _tag = Tag(text: myController.text, color: 2, visibleFlg: 1);
-                                    await Tag.insertTag(_tag);
-                                    final List<Tag> tags = await Tag.getTags();
-                                    setState(() {
-                                      _tagList = tags;
-                                      _selectedvalue = null;
-                                      // print(_tagList[3].text);
-                                      // print(_tagList.length);
-                                    });
-                                    myController.clear();
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            ),
-                          )
+                          builder: (context) {
+                            return StatefulBuilder(
+                              builder: (context, dialogState) {
+                                return AlertDialog(
+                                  title: Text("教材の登録"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      TextField(
+                                        controller: myController,
+                                        maxLength: 15,
+                                      ),
+
+                                      Text('色の登録'),
+
+                                      Row(
+                                        children: <Widget>[
+                                          // FloatingActionButton(
+                                          //   onPressed: () => tagChoice(dialogState),
+                                          //   backgroundColor: Colors.white,
+                                          //   foregroundColor: Color(0xffff0000),
+                                          //   shape: CircleBorder(
+                                          //     side: BorderSide(
+                                          //       color: (_tagColor == 1) ? Colors.blue : Colors.white,
+                                          //       width: 3,
+                                          //     )
+                                          //   ),
+                                          //   child: Icon(
+                                          //     Icons.bookmark,
+                                          //     size: 30,
+                                          //   ),
+                                          // ),
+
+                                          // TagButton(dialogState),
+                                          TagButton(dialogState, 2, 0xffff0000),
+                                          TagButton(dialogState, 3, 0xff00ff00),
+                                        ],
+                                      ),
+
+                                      ElevatedButton(
+                                        child: Text('保存'),
+                                        onPressed: () async {
+                                          Tag _tag = Tag(text: myController.text, color: 11111, visibleFlg: 1);
+                                          await Tag.insertTag(_tag);
+                                          final List<Tag> tags = await Tag.getTags();
+                                          setState(() {
+                                            _tagList = tags;
+                                            _selectedvalue = null;
+                                          });
+                                          myController.clear();
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                            
                         );
                       },
-
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.all(3),
                         backgroundColor: sc.baseColor,
@@ -332,65 +394,6 @@ class RecordState extends State<RecordStateful> {
         ),
       ),
     );
-  }
-}
-
-// Tag クラス
-class Tag {
-  final int? id;
-  final String text;
-  final int color;
-  final int visibleFlg;
-
-  Tag({
-    this.id,
-    required this.text,
-    required this.color,
-    required this.visibleFlg,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'text': text,
-      'color': color,
-      'visibleFlg': visibleFlg,
-    };
-  }
-
-  static Future<Database> get database async {
-    final Future<Database> _database = openDatabase(
-      join(await getDatabasesPath(), 'record_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "create table tag(id integer primary key autoincrement, text text, color integer, visibleFlg integer)"
-        );
-      },
-      version: 1,
-    );
-    return _database;
-  }
-
-  static Future<void> insertTag(Tag tag) async {
-    final Database db = await database;
-    await db.insert(
-      'tag',
-      tag.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  static Future<List<Tag>> getTags() async {
-    final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('tag');
-    return List.generate(maps.length, (i) {
-      return Tag(
-        id: maps[i]['id'],
-        text: maps[i]['text'],
-        color: maps[i]['color'],
-        visibleFlg: maps[i]['visibleFlg'],
-      );
-    });
   }
 }
 
