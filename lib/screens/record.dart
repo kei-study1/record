@@ -36,10 +36,13 @@ class RecordState extends State<RecordStateful> {
   // Tag color
   int _tagColor = 1;
   int _tagColorCord = 0xffff0000;
+  // Tag Dialog
+  bool _stopRegistFlg = false;
   // TimerUtil
   TimerUtil tu = TimerUtil();
   // Tagクラス
   List<Tag> _tagList = [];
+  int _tagSelect = -1;
   Future<void> initialize() async {
     _tagList = await Tag.getTags();
   }
@@ -47,6 +50,8 @@ class RecordState extends State<RecordStateful> {
   final recordController = TextEditingController();
   final myController = TextEditingController();
   var _selectedvalue;
+
+  final focusNode = FocusNode();
 
   void _buttonPress() {
     setState(() {
@@ -77,6 +82,68 @@ class RecordState extends State<RecordStateful> {
       _countTimer = tu.stringDateTime(tu.dateTimeIntSeconds(_seconds));
     });
   }
+  void _tagChoice(int i) {
+    setState(() {
+      _tagSelect = i;
+    });
+  }
+  void _tagDeleteDialog(BuildContext context, int i) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+        backgroundColor: sc.baseColor,
+        children: <Widget>[
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '「' + _tagList[i].text + '」',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 25,
+                  color: sc.subColor
+                ),
+              ),
+              Text(
+                'を削除しますか？',
+                style: TextStyle(
+                  fontSize: 25,
+                  color: Colors.white
+                ),
+              ),
+            ],
+          ),
+          SimpleDialogOption(
+            onPressed: () async {
+              await Tag.deleteTag(_tagList[i].id!);
+              final List<Tag> tags = await Tag.getTags();
+              setState(() {
+                _tagList = tags;
+              });
+              Navigator.pop(context);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text('yes', style: TextStyle(color: Colors.white, fontSize: 20),),
+              ],
+            ),
+          ),
+          SimpleDialogOption(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text('no', style: TextStyle(color: Colors.white, fontSize: 20),),
+              ],
+            ),
+          ),
+        ],
+      )
+    );
+  }
 
   // タグ表示用Widget
   Widget TagButton(StateSetter dialogState, int tagNo, int tagColorCord) {
@@ -89,12 +156,12 @@ class RecordState extends State<RecordStateful> {
         });
         print('$_tagColor' + ' : ' +  '$_tagColorCord');
       },
-      backgroundColor: Colors.white,
+      backgroundColor: sc.baseColor3,
       foregroundColor: Color(tagColorCord),
       shape: CircleBorder(
         side: BorderSide(
-          color: (_tagColor == tagNo) ? Colors.blue : Colors.white,
-          width: 3,
+          color: (_tagColor == tagNo) ? sc.subColor! : sc.baseColor3!,
+          width: 7,
         )
       ),
       child: Icon(
@@ -126,7 +193,7 @@ class RecordState extends State<RecordStateful> {
                     // color: sc.baseColor,
                     height: 500,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         
                         Card(
@@ -260,7 +327,7 @@ class RecordState extends State<RecordStateful> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
                             ),
                             child: Text(
-                              '登録する',
+                              '登録',
                               style: TextStyle(
                                 fontSize: 20
                               ),
@@ -281,7 +348,7 @@ class RecordState extends State<RecordStateful> {
                 Expanded(
                   flex: 7,
                   child: Container(
-                    height: MediaQuery.of(context).size.height,
+                    // height: MediaQuery.of(context).size.height,
                     child: Column(
                       children: <Widget>[
                         ElevatedButton(
@@ -291,61 +358,130 @@ class RecordState extends State<RecordStateful> {
                               builder: (context) {
                                 return StatefulBuilder(
                                   builder: (context, dialogState) {
-                                    return AlertDialog(
-                                      title: Text("教材の登録"),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          TextField(
-                                            controller: myController,
-                                            maxLength: 15,
-                                          ),
-
-                                          Text('色の選択'),
-
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    return Focus(
+                                      focusNode: focusNode,
+                                      child: GestureDetector(
+                                        onTap: focusNode.requestFocus,
+                                        child: AlertDialog(
+                                          backgroundColor: sc.baseColor,
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: <Widget>[
-                                              TagButton(dialogState, 1, 0xffff0000),
-                                              TagButton(dialogState, 2, 0xffff007f),
-                                              TagButton(dialogState, 3, 0xffff00ff),
-                                              TagButton(dialogState, 4, 0xff7f00ff),
+                                              const Text(
+                                                "やることの登録",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20
+                                                ),
+                                              ),
+                                              (_stopRegistFlg)? 
+                                                Text('やることを記入してください！', style: TextStyle(color: Colors.red),) 
+                                                : Container(),
+                                              TextField(
+                                                onChanged: (text) {
+                                                  if (text.length > 0) {
+                                                    dialogState(() {
+                                                      _stopRegistFlg = false;
+                                                    });
+                                                  }
+                                                },
+                                                controller: myController,
+                                                maxLength: 15,
+                                                style: TextStyle(
+                                                  color: Colors.white
+                                                ),
+                                                decoration: InputDecoration(
+                                                  helperStyle: TextStyle(
+                                                    color: Colors.white
+                                                  ),
+                                                  fillColor: sc.baseColor,
+                                                  filled: true,
+                                                  enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: Colors.white
+                                                    )
+                                                  ),
+                                                  focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                      color: sc.subColor!
+                                                    )
+                                                  ),
+                                                ),
+                                              ),
+                                                                          
+                                              const Text(
+                                                "色の選択",
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20
+                                                ),
+                                              ),
+                                                                          
+                                              Sb('h', 10),
+                                                                          
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  TagButton(dialogState, 1, 0xffff0000),
+                                                  TagButton(dialogState, 2, 0xffff007f),
+                                                  TagButton(dialogState, 3, 0xffff00ff),
+                                                  TagButton(dialogState, 4, 0xff7f00ff),
+                                                ],
+                                              ),
+                                              Sb('h', 2),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  TagButton(dialogState, 5, 0xff0000ff),
+                                                  TagButton(dialogState, 6, 0xff007fff),
+                                                  TagButton(dialogState, 7, 0xff00ffff),
+                                                  TagButton(dialogState, 8, 0xff00ff7f),
+                                                ],
+                                              ),
+                                              Sb('h', 2),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  TagButton(dialogState, 9, 0xff00ff00),
+                                                  TagButton(dialogState, 10, 0xff7fff00),
+                                                  TagButton(dialogState, 11, 0xffffff00),
+                                                  TagButton(dialogState, 12, 0xffff7f00),
+                                                ],
+                                              ),
+                                                                          
+                                              Sb('h', 10),
+                                                                          
+                                              Container(
+                                                width: double.infinity,
+                                                child: ElevatedButton(
+                                                  child: Text('登録', style: TextStyle(fontSize: 20),),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: sc.subColor,
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                                                  ),
+                                                  onPressed: (myController.text.length == 0)? 
+                                                    () {
+                                                      dialogState(() {
+                                                        _stopRegistFlg = true;
+                                                      });
+                                                    }
+                                                    : () async {
+                                                    Tag _tag = Tag(text: myController.text, color: _tagColorCord, visibleFlg: 1);
+                                                    await Tag.insertTag(_tag);
+                                                    final List<Tag> tags = await Tag.getTags();
+                                                    setState(() {
+                                                      _tagList = tags;
+                                                      _selectedvalue = null;
+                                                    });
+                                                    myController.clear();
+                                                    Navigator.pop(context);
+                                                  },
+                                                  // onPressed: (myController.text.length == 0)? null :
+                                                ),
+                                              ),
                                             ],
                                           ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              TagButton(dialogState, 5, 0xff0000ff),
-                                              TagButton(dialogState, 6, 0xff007fff),
-                                              TagButton(dialogState, 7, 0xff00ffff),
-                                              TagButton(dialogState, 8, 0xff00ff7f),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: <Widget>[
-                                              TagButton(dialogState, 9, 0xff00ff00),
-                                              TagButton(dialogState, 10, 0xff7fff00),
-                                              TagButton(dialogState, 11, 0xffffff00),
-                                              TagButton(dialogState, 12, 0xffff7f00),
-                                            ],
-                                          ),
-
-                                          ElevatedButton(
-                                            child: Text('登録'),
-                                            onPressed: () async {
-                                              Tag _tag = Tag(text: myController.text, color: _tagColorCord, visibleFlg: 1);
-                                              await Tag.insertTag(_tag);
-                                              final List<Tag> tags = await Tag.getTags();
-                                              setState(() {
-                                                _tagList = tags;
-                                                _selectedvalue = null;
-                                              });
-                                              myController.clear();
-                                              Navigator.pop(context);
-                                            },
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                     );
                                   },
@@ -382,8 +518,39 @@ class RecordState extends State<RecordStateful> {
 
                         Sb('h', 5),
 
+                        ElevatedButton(
+                          onPressed: () => _tagChoice(-1),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.all(3),
+                            backgroundColor: sc.baseColor,
+                            side: BorderSide(
+                              color: (_tagSelect == -1)? sc.subColor! : sc.baseColor!,
+                              width: 3
+                            )
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            child: Column(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.bookmark,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
+                                Container(
+                                  child: Text(
+                                    'その他',
+                                    textAlign: TextAlign.center,
+                                  )
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Sb('h', 5),
+
                         Container(
-                          height: 600,
+                          height: 450,
                           // height: MediaQuery.of(context).size.height,
                           child: FutureBuilder(
                             future: initialize(),
@@ -400,10 +567,15 @@ class RecordState extends State<RecordStateful> {
                                   return Column(
                                     children: <Widget> [
                                       ElevatedButton(
-                                        onPressed: () {},
+                                        onPressed: () => _tagChoice(index),
+                                        onLongPress: () => _tagDeleteDialog(context, index),
                                         style: ElevatedButton.styleFrom(
                                           padding: EdgeInsets.all(3),
                                           backgroundColor: sc.baseColor,
+                                          side: BorderSide(
+                                            color: (_tagSelect == index)? sc.subColor! : sc.baseColor!,
+                                            width: 3
+                                          )
                                         ),
                                         child: Container(
                                           width: double.infinity,

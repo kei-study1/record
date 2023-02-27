@@ -61,15 +61,16 @@ class Tag {
   }
 
   // visibleFlg = 1 を 0 に変換する。
-  static Future<void> deleteTag(Tag tag) async {
+  static Future<void> deleteTag(int i) async {
     final db = await database;
-    await db.update(
-      'tag',
-      tag.toMap(),
-      where: "visibleFlg = ?",
-      whereArgs: [tag.visibleFlg],
-      conflictAlgorithm: ConflictAlgorithm.rollback,
-    );
+    // await db.update(
+    //   'tag',
+    //   tag.toMap(),
+    //   where: "visibleFlg = ?",
+    //   whereArgs: [tag.visibleFlg],
+    //   conflictAlgorithm: ConflictAlgorithm.rollback,
+    // );
+    await db.rawUpdate('update tag set visibleFlg = 0 where id = ?', [i]);
   }
 
   // データ削除用
