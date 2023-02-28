@@ -13,9 +13,11 @@ Widget Sb(String w, double s) {
 
 Widget ConText(String s, double width, double fontSize) {
   return Container(
+    // color: Colors.red,
     width: width,
     child: Text(
       s,
+      textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: fontSize,
         color: Colors.white

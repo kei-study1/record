@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'screenRoot.dart';
 import '../db.dart';
@@ -28,6 +29,7 @@ class RecordState extends State<RecordStateful> {
   // Timer用
   late Timer _timer;
   int _seconds = 0;
+  int _restSeconds = 0;
   String _countTimer = '00:00:00';
   bool _buttonOn = false;
   late DateTime? _startTime = null;
@@ -61,12 +63,13 @@ class RecordState extends State<RecordStateful> {
       _buttonOn = !_buttonOn;
       if(_buttonOn) {
         _timer = Timer.periodic(
-          Duration(seconds: 1),
+          Duration(milliseconds: 500),
           _onTimer
         );
+        _restSeconds = tu.intSecondsDateTimeBetween(_startTime, DateTime.now()) - _seconds;
         if (_endTime != null) {
           _restTime = tu.dateTimeIntSeconds(
-            tu.intSecondsDateTimeBetween(_startTime, DateTime.now()) - _seconds
+            _restSeconds
           );
         }
         _endTime = null;
@@ -77,10 +80,69 @@ class RecordState extends State<RecordStateful> {
     });
   }
   void _onTimer(Timer t) {
-    _seconds++;
+    _seconds = tu.intSecondsDateTimeBetween(_startTime, DateTime.now()) - _restSeconds;
     setState(() {
       _countTimer = tu.stringDateTime(tu.dateTimeIntSeconds(_seconds));
     });
+  }
+  void _resetTimer(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          contentPadding: EdgeInsets.all(10),
+          backgroundColor: sc.baseColor,
+          children: <Widget>[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'タイマーをリセットしますか？',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white
+                  ),
+                ),
+                Sb('h', 20)
+              ],
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                setState(() {
+                  _timer.cancel();
+                  _seconds = 0;
+                  _restSeconds = 0;
+                  _countTimer = '00:00:00';
+                  _buttonOn = false;
+                  _startTime = null;
+                  _endTime = null;
+                  _restTime = null;
+                });
+                Navigator.pop(context);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('YES', style: TextStyle(color: Colors.white, fontSize: 20),),
+                ],
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('NO', style: TextStyle(color: Colors.white, fontSize: 20),),
+                ],
+              ),
+            ),
+          ],
+        );
+      }
+    );
   }
   void _tagChoice(int i) {
     setState(() {
@@ -91,13 +153,14 @@ class RecordState extends State<RecordStateful> {
     showDialog(
       context: context,
       builder: (BuildContext context) => SimpleDialog(
+        contentPadding: EdgeInsets.all(10),
         backgroundColor: sc.baseColor,
         children: <Widget>[
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '「' + _tagList[i].text + '」',
+                _tagList[i].text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25,
@@ -107,7 +170,7 @@ class RecordState extends State<RecordStateful> {
               Text(
                 'を削除しますか？',
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 20,
                   color: Colors.white
                 ),
               ),
@@ -119,13 +182,17 @@ class RecordState extends State<RecordStateful> {
               final List<Tag> tags = await Tag.getTags();
               setState(() {
                 _tagList = tags;
+                // 選択状態のタグを消した時は、その他を選択にする
+                if (_tagSelect == i) {
+                  _tagSelect = -1;
+                }
               });
               Navigator.pop(context);
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('yes', style: TextStyle(color: Colors.white, fontSize: 20),),
+                Text('YES', style: TextStyle(color: Colors.white, fontSize: 20),),
               ],
             ),
           ),
@@ -136,7 +203,7 @@ class RecordState extends State<RecordStateful> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text('no', style: TextStyle(color: Colors.white, fontSize: 20),),
+                Text('NO', style: TextStyle(color: Colors.white, fontSize: 20),),
               ],
             ),
           ),
@@ -156,12 +223,12 @@ class RecordState extends State<RecordStateful> {
         });
         print('$_tagColor' + ' : ' +  '$_tagColorCord');
       },
-      backgroundColor: sc.baseColor3,
+      backgroundColor: (_tagColor == tagNo) ? sc.baseColor2 : sc.baseColor3,
       foregroundColor: Color(tagColorCord),
       shape: CircleBorder(
         side: BorderSide(
           color: (_tagColor == tagNo) ? sc.subColor! : sc.baseColor3!,
-          width: 7,
+          width: 5,
         )
       ),
       child: Icon(
@@ -197,7 +264,7 @@ class RecordState extends State<RecordStateful> {
                       children: <Widget>[
                         
                         Card(
-                          color: _buttonOn? sc.baseColor : sc.baseColor2,
+                          color: _buttonOn? sc.subColor : sc.baseColor,
                           child: Container(
                             padding: EdgeInsets.only(left: 17, top: 8, bottom:8),
                             width: double.infinity,
@@ -218,15 +285,16 @@ class RecordState extends State<RecordStateful> {
                           children: <Widget>[
                             FloatingActionButton(
                               // なんとなくタグの全件削除を入れている。
-                              onPressed: () async {
-                                await Tag.deleteAllTag();
-                                final List<Tag> tags = await Tag.getTags();
-                                setState(() {
-                                  _tagList = tags;
-                                  _selectedvalue = null;
-                                });
-                              },
+                              // onPressed: () async {
+                              //   await Tag.deleteAllTag();
+                              //   final List<Tag> tags = await Tag.getTags();
+                              //   setState(() {
+                              //     _tagList = tags;
+                              //     _selectedvalue = null;
+                              //   });
+                              // },
                               // splashColor: sc.subColor,
+                              onPressed: () => _resetTimer(context),
                               backgroundColor: Colors.red,
                               child: Icon(Icons.restart_alt, size: 40,),
                             ),
@@ -247,11 +315,12 @@ class RecordState extends State<RecordStateful> {
                             children: <Widget>[
                               Row(
                                 children: <Widget>[
-                                  ConText('開始時刻：', 100, 20),
+                                  ConText('START', 75, 20),
+                                  ConText(':', 20, 20),
                                   ConText(
                                     (_startTime == null)? '' :
                                     tu.stringDateTime(_startTime!),
-                                    150,
+                                    160,
                                     30
                                   ),
                                 ],
@@ -259,11 +328,12 @@ class RecordState extends State<RecordStateful> {
 
                               Row(
                                 children: <Widget>[
-                                  ConText('終了時刻：', 100, 20),
+                                  ConText('END', 75, 20),
+                                  ConText(':', 20, 20),
                                   ConText(
                                     (_endTime == null)? '' :
                                     tu.stringDateTime(_endTime!),
-                                    150,
+                                    160,
                                     30
                                   ),
                                 ],
@@ -271,11 +341,12 @@ class RecordState extends State<RecordStateful> {
 
                               Row(
                                 children: <Widget>[
-                                  ConText('休憩時刻：', 100, 20),
+                                  ConText('REST', 75, 20),
+                                  ConText(':', 20, 20),
                                   ConText(
                                     (_restTime == null)? '' :
                                     tu.stringDateTime(_restTime!),
-                                    150,
+                                    160,
                                     30
                                   ),
                                 ],
@@ -327,7 +398,7 @@ class RecordState extends State<RecordStateful> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
                             ),
                             child: Text(
-                              '登録',
+                              'REGISTER',
                               style: TextStyle(
                                 fontSize: 20
                               ),
@@ -364,122 +435,127 @@ class RecordState extends State<RecordStateful> {
                                         onTap: focusNode.requestFocus,
                                         child: AlertDialog(
                                           backgroundColor: sc.baseColor,
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              const Text(
-                                                "やることの登録",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 20
+                                          content: Container(
+                                            width: 200,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                const Text(
+                                                  "TO DO",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20
+                                                  ),
                                                 ),
-                                              ),
-                                              (_stopRegistFlg)? 
-                                                Text('やることを記入してください！', style: TextStyle(color: Colors.red),) 
-                                                : Container(),
-                                              TextField(
-                                                onChanged: (text) {
-                                                  if (text.length > 0) {
+                                                (_stopRegistFlg)? 
+                                                  Text('やることを記入してください！', style: TextStyle(color: Colors.red),) 
+                                                  : Container(),
+                                                TextField(
+                                                  controller: myController,
+                                                  onChanged: (text) {
                                                     dialogState(() {
-                                                      _stopRegistFlg = false;
+                                                      myController;
+                                                      if (text.length > 0) {
+                                                        _stopRegistFlg = false;
+                                                      }
                                                     });
-                                                  }
-                                                },
-                                                controller: myController,
-                                                maxLength: 15,
-                                                style: TextStyle(
-                                                  color: Colors.white
-                                                ),
-                                                decoration: InputDecoration(
-                                                  helperStyle: TextStyle(
+                                                  },
+                                                  maxLength: 15,
+                                                  maxLengthEnforcement: MaxLengthEnforcement.truncateAfterCompositionEnds,
+                                                  style: TextStyle(
                                                     color: Colors.white
                                                   ),
-                                                  fillColor: sc.baseColor,
-                                                  filled: true,
-                                                  enabledBorder: UnderlineInputBorder(
-                                                    borderSide: BorderSide(
+                                                  decoration: InputDecoration(
+                                                    helperStyle: TextStyle(
                                                       color: Colors.white
-                                                    )
-                                                  ),
-                                                  focusedBorder: UnderlineInputBorder(
-                                                    borderSide: BorderSide(
-                                                      color: sc.subColor!
-                                                    )
+                                                    ),
+                                                    fillColor: sc.baseColor,
+                                                    filled: true,
+                                                    enabledBorder: UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color: Colors.white
+                                                      )
+                                                    ),
+                                                    focusedBorder: UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color: sc.subColor!
+                                                      )
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                                                          
-                                              const Text(
-                                                "色の選択",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 20
-                                                ),
-                                              ),
-                                                                          
-                                              Sb('h', 10),
-                                                                          
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  TagButton(dialogState, 1, 0xffff0000),
-                                                  TagButton(dialogState, 2, 0xffff007f),
-                                                  TagButton(dialogState, 3, 0xffff00ff),
-                                                  TagButton(dialogState, 4, 0xff7f00ff),
-                                                ],
-                                              ),
-                                              Sb('h', 2),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  TagButton(dialogState, 5, 0xff0000ff),
-                                                  TagButton(dialogState, 6, 0xff007fff),
-                                                  TagButton(dialogState, 7, 0xff00ffff),
-                                                  TagButton(dialogState, 8, 0xff00ff7f),
-                                                ],
-                                              ),
-                                              Sb('h', 2),
-                                              Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: <Widget>[
-                                                  TagButton(dialogState, 9, 0xff00ff00),
-                                                  TagButton(dialogState, 10, 0xff7fff00),
-                                                  TagButton(dialogState, 11, 0xffffff00),
-                                                  TagButton(dialogState, 12, 0xffff7f00),
-                                                ],
-                                              ),
-                                                                          
-                                              Sb('h', 10),
-                                                                          
-                                              Container(
-                                                width: double.infinity,
-                                                child: ElevatedButton(
-                                                  child: Text('登録', style: TextStyle(fontSize: 20),),
-                                                  style: ElevatedButton.styleFrom(
-                                                    backgroundColor: sc.subColor,
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                                                                            
+                                                const Text(
+                                                  "COLOR SELECT",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20
                                                   ),
-                                                  onPressed: (myController.text.length == 0)? 
-                                                    () {
-                                                      dialogState(() {
-                                                        _stopRegistFlg = true;
+                                                ),
+                                                                            
+                                                Sb('h', 10),
+                                                                            
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: <Widget>[
+                                                    TagButton(dialogState, 1, 0xffff0000),
+                                                    TagButton(dialogState, 2, 0xffff007f),
+                                                    TagButton(dialogState, 3, 0xffff00ff),
+                                                    TagButton(dialogState, 4, 0xff7f00ff),
+                                                  ],
+                                                ),
+                                                Sb('h', 2),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: <Widget>[
+                                                    TagButton(dialogState, 5, 0xff0000ff),
+                                                    TagButton(dialogState, 6, 0xff007fff),
+                                                    TagButton(dialogState, 7, 0xff00ffff),
+                                                    TagButton(dialogState, 8, 0xff00ff7f),
+                                                  ],
+                                                ),
+                                                Sb('h', 2),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: <Widget>[
+                                                    TagButton(dialogState, 9, 0xff00ff00),
+                                                    TagButton(dialogState, 10, 0xff7fff00),
+                                                    TagButton(dialogState, 11, 0xffffff00),
+                                                    TagButton(dialogState, 12, 0xffff7f00),
+                                                  ],
+                                                ),
+                                                                            
+                                                Sb('h', 10),
+                                                                            
+                                                Container(
+                                                  width: double.infinity,
+                                                  child: ElevatedButton(
+                                                    child: Text('REGISTER', style: TextStyle(fontSize: 20),),
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: sc.subColor,
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                                                    ),
+                                                    onPressed: (myController.text.length == 0)? 
+                                                      () {
+                                                        dialogState(() {
+                                                          _stopRegistFlg = true;
+                                                        });
+                                                      }
+                                                      : () async {
+                                                      Tag _tag = Tag(text: myController.text, color: _tagColorCord, visibleFlg: 1);
+                                                      await Tag.insertTag(_tag);
+                                                      final List<Tag> tags = await Tag.getTags();
+                                                      setState(() {
+                                                        _tagList = tags;
+                                                        _selectedvalue = null;
                                                       });
-                                                    }
-                                                    : () async {
-                                                    Tag _tag = Tag(text: myController.text, color: _tagColorCord, visibleFlg: 1);
-                                                    await Tag.insertTag(_tag);
-                                                    final List<Tag> tags = await Tag.getTags();
-                                                    setState(() {
-                                                      _tagList = tags;
-                                                      _selectedvalue = null;
-                                                    });
-                                                    myController.clear();
-                                                    Navigator.pop(context);
-                                                  },
-                                                  // onPressed: (myController.text.length == 0)? null :
+                                                      myController.clear();
+                                                      Navigator.pop(context);
+                                                    },
+                                                    // onPressed: (myController.text.length == 0)? null :
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
