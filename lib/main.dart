@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:record/screens/screenRoot.dart';
+import 'package:record/screens/recordList.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,12 +49,13 @@ class _MainPageState extends State<MainPage> {
           body: IndexedStack(
             index: _currentIndex,
             children: screenList.screenLists,
-          ),
+          )
+          ,
       
           bottomNavigationBar: BottomNavigationBar(
             items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(icon: const Icon(Icons.edit), backgroundColor: screenColor.baseColor, label: 'Record'),
-              BottomNavigationBarItem(icon: const Icon(Icons.photo_album), backgroundColor: screenColor.baseColor, label: 'Album'),
+              BottomNavigationBarItem(icon: const Icon(Icons.edit), backgroundColor: screenColor.baseColor, label: 'RECORD'),
+              BottomNavigationBarItem(icon: const Icon(Icons.list), backgroundColor: screenColor.baseColor, label: 'LIST'),
               BottomNavigationBarItem(icon: const Icon(Icons.chat), backgroundColor: screenColor.baseColor, label: 'Chat'),
             ],
             currentIndex: _currentIndex,

@@ -48,6 +48,9 @@ class RecordState extends State<RecordStateful> {
   Future<void> initialize() async {
     _tagList = await Tag.getTags();
   }
+  // test
+  List<RecordDb> _recordList = [];
+
   // TextField
   final recordController = TextEditingController();
   final myController = TextEditingController();
@@ -294,7 +297,20 @@ class RecordState extends State<RecordStateful> {
                               //   });
                               // },
                               // splashColor: sc.subColor,
-                              onPressed: () => _resetTimer(context),
+
+                              // こっち
+                              // onPressed: () => _resetTimer(context),
+
+                              onPressed: () async {
+                                await RecordDb.deleteAllRecord();
+                                final List<RecordDb> records = await RecordDb.getRecords();
+                                setState(() {
+                                  print(records);
+                                  _recordList = records;
+                                  _selectedvalue = null;
+                                });
+                              },
+
                               backgroundColor: Colors.red,
                               child: Icon(Icons.restart_alt, size: 40,),
                             ),
@@ -367,7 +383,7 @@ class RecordState extends State<RecordStateful> {
                               color: Colors.white
                             ),
                             decoration: InputDecoration(
-                              hintText: "memo",
+                              hintText: "MEMO",
                               hintStyle: TextStyle(
                                 color: Colors.white
                               ),
@@ -392,7 +408,17 @@ class RecordState extends State<RecordStateful> {
                         Container(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              RecordDb _record = RecordDb(text: recordController.text, tagId: _tagList[_tagSelect].id!);
+                              await RecordDb.insertRecord(_record);
+                              final List<RecordDb> records = await RecordDb.getRecords();
+                              setState(() {
+                                _recordList = records;
+                                _selectedvalue = null;
+                              });
+                              recordController.clear();
+                              // Navigator.pop(context);
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: sc.subColor,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
@@ -405,7 +431,6 @@ class RecordState extends State<RecordStateful> {
                             )
                           ),
                         ),
-                  
                       ],
                     ),
                   ),
@@ -630,7 +655,7 @@ class RecordState extends State<RecordStateful> {
                           // height: MediaQuery.of(context).size.height,
                           child: FutureBuilder(
                             future: initialize(),
-                            builder: (context, snapshot) {
+                            builder: (context2, snapshot) {
                               // if(snapshot.connectionState == ConnectionState.waiting) {
                               //   // 非同期処理未完了 = 通信中
                               //   return Center(
@@ -639,12 +664,12 @@ class RecordState extends State<RecordStateful> {
                               // }
                               return ListView.builder(
                                 itemCount: _tagList.length,
-                                itemBuilder: (context, index) {
+                                itemBuilder: (context2, index) {
                                   return Column(
                                     children: <Widget> [
                                       ElevatedButton(
                                         onPressed: () => _tagChoice(index),
-                                        onLongPress: () => _tagDeleteDialog(context, index),
+                                        onLongPress: () => _tagDeleteDialog(context2, index),
                                         style: ElevatedButton.styleFrom(
                                           padding: EdgeInsets.all(3),
                                           backgroundColor: sc.baseColor,

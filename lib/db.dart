@@ -25,11 +25,19 @@ class Tag {
   }
 
   static Future<Database> get database async {
+    //DBのパスを消す用のコード
+    // deleteDatabase(join(await getDatabasesPath(), 'record_database.db'));
     final Future<Database> _database = openDatabase(
       join(await getDatabasesPath(), 'record_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
+      onCreate: (db, version) async {
+        // return db.execute(
+        //   "create table tag(id integer primary key autoincrement, text text, color integer, visibleFlg integer)"
+        // );
+        await db.execute(
           "create table tag(id integer primary key autoincrement, text text, color integer, visibleFlg integer)"
+        );
+        await db.execute(
+          "create table record(id integer primary key autoincrement, text text, tagId integer, foreign key(tagId) references tag(id))"
         );
       },
       version: 1,
@@ -60,6 +68,19 @@ class Tag {
     });
   }
 
+  static Future<List<Tag>> getAllTags() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('tag');
+    return List.generate(maps.length, (i) {
+      return Tag(
+        id: maps[i]['id'],
+        text: maps[i]['text'],
+        color: maps[i]['color'],
+        visibleFlg: maps[i]['visibleFlg'],
+      );
+    });
+  }
+
   // visibleFlg = 1 を 0 に変換する。
   static Future<void> deleteTag(int i) async {
     final db = await database;
@@ -78,4 +99,114 @@ class Tag {
     final db = await database;
     await db.rawDelete('delete from tag');
   }
+}
+
+// Record クラス
+class RecordDb {
+  final int? id;
+  final String text;
+  final int tagId;
+
+  RecordDb({
+    this.id,
+    required this.text,
+    required this.tagId,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'text': text,
+      'tagId' : tagId,
+    };
+  }
+
+  //理論場これでもいけると思う！
+  static Future<Database> database = Tag.database;
+
+  static Future<void> insertRecord(RecordDb record) async {
+    final Database db = await database;
+    await db.insert(
+      'record',
+      record.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<List<RecordDb>> getRecords() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      // 'select * from record r inner join tag t on r.tagId = t.id'
+      'select * from record'
+    );
+    return List.generate(maps.length, (i) {
+      return RecordDb(
+        id: maps[i]['id'],
+        text: maps[i]['text'],
+        tagId: maps[i]['tagId'],
+      );
+    });
+  }
+
+  // // visibleFlg = 1 を 0 に変換する。
+  // static Future<void> deleteRecord(int i) async {
+  //   final db = await database;
+  //   // await db.update(
+  //   //   'Record',
+  //   //   Record.toMap(),
+  //   //   where: "visibleFlg = ?",
+  //   //   whereArgs: [Record.visibleFlg],
+  //   //   conflictAlgorithm: ConflictAlgorithm.rollback,
+  //   // );
+  //   await db.rawUpdate('update Record set visibleFlg = 0 where id = ?', [i]);
+  // }
+
+  // データ削除用
+  static Future<void> deleteAllRecord() async {
+    final db = await database;
+    await db.rawDelete('delete from Record');
+  }
+}
+
+// RecordDBTagクラス
+class RecordDbTag {
+  final int? id;
+  final String recordText;
+  final String tagText;
+  final int color;
+
+  RecordDbTag({
+    required this.id,
+    required this.recordText,
+    required this.tagText,
+    required this.color,
+  });
+
+    Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'recordText': recordText,
+      'tagText': tagText,
+      'color' : color,
+    };
+  }
+
+  //理論場これでもいけると思う！
+  static Future<Database> database = Tag.database;
+
+  static Future<List<RecordDbTag>> getAllRecordDbTag() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      'select r.id, r.text as recordText, t.text as tagText, color from record r inner join tag t on r.tagId = t.id order by r.id desc'
+    );
+    return List.generate(maps.length, (i) {
+      return RecordDbTag(
+        id: maps[i]['id'],
+        recordText: maps[i]['recordText'],
+        tagText: maps[i]['tagText'],
+        color: maps[i]['color'],
+      );
+    });
+  }
+
 }
