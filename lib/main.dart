@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:record/screens/screenRoot.dart';
-import 'package:record/screens/recordList.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,7 +24,7 @@ class _MainPageState extends State<MainPage> {
   ScreenColor screenColor = ScreenColor();
   // スクリーンのリスト
   ScreenList screenList = ScreenList();
-    // テキストフィールド用
+  // テキストフィールド用
   final focusNode = FocusNode();
 
   @override
@@ -68,9 +67,11 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  void _onItemTapped(int index) => setState(() {
-    _currentIndex = index;
-  });
+  void _onItemTapped(int index) async {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 }
 
 

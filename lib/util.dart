@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
 
 // 行間空け用
 Widget Sb(String w, double s) {
@@ -58,4 +57,18 @@ class TimerUtil {
     return e.difference(s).inSeconds;
   }
 
+  List<int> intDateTimes(DateTime? t) {
+    if (t == null) {
+      return [0, 0, 0, 0, 0, 0];
+    }
+
+    List<int> a = [];
+    a.add(int.parse(DateFormat('yyyy').format(t)));
+    a.add(int.parse(DateFormat('MM').format(t)));
+    a.add(int.parse(DateFormat('dd').format(t)));
+    a.add(int.parse(DateFormat('HH').format(t)));
+    a.add(int.parse(DateFormat('mm').format(t)));
+    a.add(int.parse(DateFormat('ss').format(t)));
+    return a;
+  }
 }

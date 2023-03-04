@@ -78,7 +78,10 @@ class RecordState extends State<RecordStateful> {
         _endTime = null;
       } else {
         _timer.cancel();
-        _endTime = DateTime.now();
+        _endTime = tu.dateTimeIntSeconds(
+          tu.intSecondsDateTime(_startTime!)
+          + _seconds + _restSeconds
+        );
       }
     });
   }
@@ -303,12 +306,6 @@ class RecordState extends State<RecordStateful> {
 
                               onPressed: () async {
                                 await RecordDb.deleteAllRecord();
-                                final List<RecordDb> records = await RecordDb.getRecords();
-                                setState(() {
-                                  print(records);
-                                  _recordList = records;
-                                  _selectedvalue = null;
-                                });
                               },
 
                               backgroundColor: Colors.red,
@@ -409,15 +406,23 @@ class RecordState extends State<RecordStateful> {
                           width: double.infinity,
                           child: ElevatedButton(
                             onPressed: () async {
-                              RecordDb _record = RecordDb(text: recordController.text, tagId: _tagList[_tagSelect].id!);
+                              RecordDb _record = RecordDb(
+                                text: recordController.text,
+                                tagId: _tagList[_tagSelect].id!,
+                                year: tu.intDateTimes(_startTime)[0],
+                                month: tu.intDateTimes(_startTime)[1],
+                                day: tu.intDateTimes(_startTime)[2],
+                                hour: tu.intDateTimes(_startTime)[3],
+                                minute: tu.intDateTimes(_startTime)[4],
+                                second: tu.intDateTimes(_startTime)[5],
+                                endToStartSecond: _seconds,
+                                restSecond: _restSeconds
+                                );
                               await RecordDb.insertRecord(_record);
-                              final List<RecordDb> records = await RecordDb.getRecords();
                               setState(() {
-                                _recordList = records;
                                 _selectedvalue = null;
                               });
                               recordController.clear();
-                              // Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: sc.subColor,

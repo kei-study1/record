@@ -25,7 +25,7 @@ class Tag {
   }
 
   static Future<Database> get database async {
-    //DBのパスを消す用のコード
+    //DBのパスを消す用のコード 本来はonCreateの後にonUpgradeを使う
     // deleteDatabase(join(await getDatabasesPath(), 'record_database.db'));
     final Future<Database> _database = openDatabase(
       join(await getDatabasesPath(), 'record_database.db'),
@@ -37,7 +37,10 @@ class Tag {
           "create table tag(id integer primary key autoincrement, text text, color integer, visibleFlg integer)"
         );
         await db.execute(
-          "create table record(id integer primary key autoincrement, text text, tagId integer, foreign key(tagId) references tag(id))"
+          "create table record(id integer primary key autoincrement, text text, tagId integer,"
+          "year integer, month integer, day integer, hour integer, minute integer, second integer,"
+          "endToStartSecond integer, restSecond integer,"
+          "foreign key(tagId) references tag(id))"
         );
       },
       version: 1,
@@ -106,18 +109,42 @@ class RecordDb {
   final int? id;
   final String text;
   final int tagId;
+  final int year;
+  final int month;
+  final int day;
+  final int hour;
+  final int minute;
+  final int second;
+  final int endToStartSecond;
+  final int restSecond;
 
   RecordDb({
     this.id,
     required this.text,
     required this.tagId,
+    required this.year,
+    required this.month,
+    required this.day,
+    required this.hour,
+    required this.minute,
+    required this.second,
+    required this.endToStartSecond,
+    required this.restSecond,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'text': text,
-      'tagId' : tagId,
+      'tagId': tagId,
+      'year': year,
+      'month': month,
+      'day': day,
+      'hour': hour,
+      'minute': minute,
+      'second': second,
+      'endToStartSecond': endToStartSecond,
+      'restSecond': restSecond
     };
   }
 
@@ -133,20 +160,20 @@ class RecordDb {
     );
   }
 
-  static Future<List<RecordDb>> getRecords() async {
-    final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.rawQuery(
-      // 'select * from record r inner join tag t on r.tagId = t.id'
-      'select * from record'
-    );
-    return List.generate(maps.length, (i) {
-      return RecordDb(
-        id: maps[i]['id'],
-        text: maps[i]['text'],
-        tagId: maps[i]['tagId'],
-      );
-    });
-  }
+  // static Future<List<RecordDb>> getRecords() async {
+  //   final Database db = await database;
+  //   final List<Map<String, dynamic>> maps = await db.rawQuery(
+  //     // 'select * from record r inner join tag t on r.tagId = t.id'
+  //     'select * from record'
+  //   );
+  //   return List.generate(maps.length, (i) {
+  //     return RecordDb(
+  //       id: maps[i]['id'],
+  //       text: maps[i]['text'],
+  //       tagId: maps[i]['tagId'],
+  //     );
+  //   });
+  // }
 
   // // visibleFlg = 1 を 0 に変換する。
   // static Future<void> deleteRecord(int i) async {
@@ -174,12 +201,28 @@ class RecordDbTag {
   final String recordText;
   final String tagText;
   final int color;
+  final int year;
+  final int month;
+  final int day;
+  final int hour;
+  final int minute;
+  final int second;
+  final int endToStartSecond;
+  final int restSecond;
 
   RecordDbTag({
     required this.id,
     required this.recordText,
     required this.tagText,
     required this.color,
+    required this.year,
+    required this.month,
+    required this.day,
+    required this.hour,
+    required this.minute,
+    required this.second,
+    required this.endToStartSecond,
+    required this.restSecond,
   });
 
     Map<String, dynamic> toMap() {
@@ -188,6 +231,14 @@ class RecordDbTag {
       'recordText': recordText,
       'tagText': tagText,
       'color' : color,
+      'year': year,
+      'month': month,
+      'day': day,
+      'hour': hour,
+      'minute': minute,
+      'second': second,
+      'endToStartSecond': endToStartSecond,
+      'restSecond': restSecond
     };
   }
 
@@ -197,7 +248,11 @@ class RecordDbTag {
   static Future<List<RecordDbTag>> getAllRecordDbTag() async {
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.rawQuery(
-      'select r.id, r.text as recordText, t.text as tagText, color from record r inner join tag t on r.tagId = t.id order by r.id desc'
+      'select '
+      'r.id, r.text as recordText, t.text as tagText, color, '
+      'year, month, day, hour, minute, second, '
+      'endToStartSecond, restSecond '
+      'from record r inner join tag t on r.tagId = t.id order by r.id desc'
     );
     return List.generate(maps.length, (i) {
       return RecordDbTag(
@@ -205,8 +260,15 @@ class RecordDbTag {
         recordText: maps[i]['recordText'],
         tagText: maps[i]['tagText'],
         color: maps[i]['color'],
+        year: maps[i]['year'],
+        month: maps[i]['month'],
+        day: maps[i]['day'],
+        hour: maps [i]['hour'],
+        minute: maps[i]['minute'],
+        second: maps[i]['second'],
+        endToStartSecond: maps[i]['endToStartSecond'],
+        restSecond: maps[i]['restSecond'],
       );
     });
   }
-
 }
