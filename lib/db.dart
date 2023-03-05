@@ -60,7 +60,16 @@ class Tag {
   static Future<List<Tag>> getTags() async {
     final Database db = await database;
     // visibleFlg = 1 のタグを取得する。
-    final List<Map<String, dynamic>> maps = await db.query('tag', where: 'visibleFlg = ?', whereArgs: [1]);
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      // 'select tag.id, tag.text, tag.color, tag.visibleFlg from tag '
+      // 'where id = 1 '
+      // 'union '
+      'select tag.id, tag.text, tag.color, tag.visibleFlg, max(record.id) from tag '
+      'left join record on tag.id = record.tagId '
+      'where visibleFlg = 1 '
+      'group by tag.id, tag.text, tag.color, tag.visibleFlg '
+      'order by record.id desc'
+    );
     return List.generate(maps.length, (i) {
       return Tag(
         id: maps[i]['id'],
@@ -82,6 +91,20 @@ class Tag {
         visibleFlg: maps[i]['visibleFlg'],
       );
     });
+  }
+
+  static Future<void> insertOtherTag() async {
+    final Database db = await database;
+    await db.insert(
+      'tag',
+      {
+        'id': 1,
+        'text': 'その他',
+        'color': 0xffffffff,
+        'visibleFlg': 1,
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
   }
 
   // visibleFlg = 1 を 0 に変換する。
@@ -188,7 +211,12 @@ class RecordDb {
   //   await db.rawUpdate('update Record set visibleFlg = 0 where id = ?', [i]);
   // }
 
-  // データ削除用
+  static Future<void> deleteRecordList(int id) async {
+    final db = await database;
+    await db.rawDelete('delete from record where id = ?', [id]);
+  }
+
+  // データ全削除用
   static Future<void> deleteAllRecord() async {
     final db = await database;
     await db.rawDelete('delete from Record');

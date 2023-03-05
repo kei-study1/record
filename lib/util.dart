@@ -25,6 +25,27 @@ Widget ConText(String s, double width, double fontSize) {
   );
 }
 
+Widget ListText1(String s, double fontSize) {
+  return Text(
+    s,
+    textAlign: TextAlign.start,
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: fontSize,
+    ),
+  );
+}
+Widget ListText2(String s, double fontSize) {
+  return Text(
+    s,
+    textAlign: TextAlign.end,
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: fontSize,
+    ),
+  );
+}
+
 // Timer用
 class TimerUtil {
   DateFormat _format = DateFormat('HH:mm:ss');
@@ -70,5 +91,13 @@ class TimerUtil {
     a.add(int.parse(DateFormat('mm').format(t)));
     a.add(int.parse(DateFormat('ss').format(t)));
     return a;
+  }
+
+  DateTime datetimeIntDate(int y, int M, int d, int h, int m ,int s) {
+    return DateTime(y, M, d, h, m, s);
+  }
+
+  String stringDateTimeDate(DateTime d) {
+    return DateFormat('yyyy/MM/dd (E) hh:mm:ss').format(d);
   }
 }

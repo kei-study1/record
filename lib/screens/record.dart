@@ -30,8 +30,10 @@ class RecordState extends State<RecordStateful> {
   late Timer _timer;
   int _seconds = 0;
   int _restSeconds = 0;
+  // String _countTimer = '00:00:00';
   String _countTimer = '00:00:00';
   bool _buttonOn = false;
+  bool _timeVisible = false;
   late DateTime? _startTime = null;
   late DateTime? _endTime = null;
   late DateTime? _restTime = null;
@@ -44,8 +46,9 @@ class RecordState extends State<RecordStateful> {
   TimerUtil tu = TimerUtil();
   // Tagクラス
   List<Tag> _tagList = [];
-  int _tagSelect = -1;
+  int _tagSelect = 0;
   Future<void> initialize() async {
+    await Tag.insertOtherTag();
     _tagList = await Tag.getTags();
   }
   // test
@@ -69,6 +72,7 @@ class RecordState extends State<RecordStateful> {
           Duration(milliseconds: 500),
           _onTimer
         );
+        _timeVisible = true;
         _restSeconds = tu.intSecondsDateTimeBetween(_startTime, DateTime.now()) - _seconds;
         if (_endTime != null) {
           _restTime = tu.dateTimeIntSeconds(
@@ -103,7 +107,7 @@ class RecordState extends State<RecordStateful> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'タイマーをリセットしますか？',
+                  'タイマーを\nリセットしますか？',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -124,6 +128,7 @@ class RecordState extends State<RecordStateful> {
                   _startTime = null;
                   _endTime = null;
                   _restTime = null;
+                  _timeVisible = false;
                 });
                 Navigator.pop(context);
               },
@@ -161,7 +166,8 @@ class RecordState extends State<RecordStateful> {
       builder: (BuildContext context) => SimpleDialog(
         contentPadding: EdgeInsets.all(10),
         backgroundColor: sc.baseColor,
-        children: <Widget>[
+        children: (_tagList[i].id != 1)? <Widget>[
+        // children: (i != 0)? <Widget>[
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -186,11 +192,15 @@ class RecordState extends State<RecordStateful> {
             onPressed: () async {
               await Tag.deleteTag(_tagList[i].id!);
               final List<Tag> tags = await Tag.getTags();
+              print(_tagSelect);
+              print(i);
               setState(() {
                 _tagList = tags;
-                // 選択状態のタグを消した時は、その他を選択にする
+                // 選択状態のタグを消した時は、一番上を選択にする
                 if (_tagSelect == i) {
-                  _tagSelect = -1;
+                  _tagSelect = 0;
+                } else if (_tagSelect > i) {
+                  _tagSelect--;
                 }
               });
               Navigator.pop(context);
@@ -213,7 +223,30 @@ class RecordState extends State<RecordStateful> {
               ],
             ),
           ),
-        ],
+        ] :
+        <Widget> [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'その他',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 25,
+                  color: sc.subColor
+                ),
+              ),
+              Text(
+                'は削除できません',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white
+                ),
+              ),
+            ],
+          ),
+        ]
+        ,
       )
     );
   }
@@ -272,14 +305,20 @@ class RecordState extends State<RecordStateful> {
                         Card(
                           color: _buttonOn? sc.subColor : sc.baseColor,
                           child: Container(
-                            padding: EdgeInsets.only(left: 17, top: 8, bottom:8),
+                            padding: EdgeInsets.only(left: 10, top: 15, bottom: 15),
                             width: double.infinity,
-                            child: Text(
-                              _countTimer,
-                              style: TextStyle(
-                                fontSize: 50,
-                                color: Colors.white,
-                              ),
+                            child: Row(
+                              children: <Widget>[
+                                Icon(Icons.history, color: Colors.white, size: 40,),
+                                Sb('w', 10),
+                                Text(
+                                  _countTimer,
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -301,15 +340,13 @@ class RecordState extends State<RecordStateful> {
                               // },
                               // splashColor: sc.subColor,
 
-                              // こっち
-                              // onPressed: () => _resetTimer(context),
+                              onPressed: () => _resetTimer(context),
 
-                              onPressed: () async {
-                                await RecordDb.deleteAllRecord();
-                              },
-
+                              // onPressed: () async {
+                              //   await RecordDb.deleteAllRecord();
+                              // },
                               backgroundColor: Colors.red,
-                              child: Icon(Icons.restart_alt, size: 40,),
+                              child: Icon(Icons.refresh, size: 40,),
                             ),
                   
                             FloatingActionButton(
@@ -323,13 +360,22 @@ class RecordState extends State<RecordStateful> {
                   
                         Sb('h', 10),
 
+                        (_timeVisible)?
                         Container(
+                          padding: EdgeInsets.all(10),
+                          // color: sc.baseColor,
+                          decoration: BoxDecoration(
+                            color: sc.baseColor,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
                           child: Column(
                             children: <Widget>[
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  ConText('START', 75, 20),
-                                  ConText(':', 20, 20),
+                                  // ConText('START', 75, 20),
+                                  // ConText(':', 20, 20),
+                                  Icon(Icons.play_circle_outline, color: Colors.white, size: 35,),
                                   ConText(
                                     (_startTime == null)? '' :
                                     tu.stringDateTime(_startTime!),
@@ -338,11 +384,12 @@ class RecordState extends State<RecordStateful> {
                                   ),
                                 ],
                               ),
-
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  ConText('END', 75, 20),
-                                  ConText(':', 20, 20),
+                                  // ConText('END', 75, 20),
+                                  // ConText(':', 20, 20),
+                                  Icon(Icons.stop_circle_outlined, color: Colors.white, size: 35,),
                                   ConText(
                                     (_endTime == null)? '' :
                                     tu.stringDateTime(_endTime!),
@@ -351,11 +398,12 @@ class RecordState extends State<RecordStateful> {
                                   ),
                                 ],
                               ),
-
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  ConText('REST', 75, 20),
-                                  ConText(':', 20, 20),
+                                  // ConText('REST', 75, 20),
+                                  // ConText(':', 20, 20),
+                                  Icon(Icons.hourglass_bottom_outlined, color: Colors.white,size: 35,),
                                   ConText(
                                     (_restTime == null)? '' :
                                     tu.stringDateTime(_restTime!),
@@ -366,7 +414,9 @@ class RecordState extends State<RecordStateful> {
                               ),
                             ],
                           )
-                        ),
+                        ) :
+                        Sb('h', 35 * 3 + 10 * 2)
+                        ,
 
                         Sb('h', 10),
                   
@@ -380,7 +430,7 @@ class RecordState extends State<RecordStateful> {
                               color: Colors.white
                             ),
                             decoration: InputDecoration(
-                              hintText: "MEMO",
+                              hintText: "memo",
                               hintStyle: TextStyle(
                                 color: Colors.white
                               ),
@@ -405,7 +455,10 @@ class RecordState extends State<RecordStateful> {
                         Container(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () async {
+                            onPressed:
+                            (_seconds == 0)?
+                            () {} :
+                            () async {
                               RecordDb _record = RecordDb(
                                 text: recordController.text,
                                 tagId: _tagList[_tagSelect].id!,
@@ -421,6 +474,16 @@ class RecordState extends State<RecordStateful> {
                               await RecordDb.insertRecord(_record);
                               setState(() {
                                 _selectedvalue = null;
+                                _timer.cancel();
+                                _seconds = 0;
+                                _restSeconds = 0;
+                                _countTimer = '00:00:00';
+                                _buttonOn = false;
+                                _startTime = null;
+                                _endTime = null;
+                                _restTime = null;
+                                _timeVisible = false;
+                                _tagSelect = 0;
                               });
                               recordController.clear();
                             },
@@ -624,39 +687,8 @@ class RecordState extends State<RecordStateful> {
 
                         Sb('h', 5),
 
-                        ElevatedButton(
-                          onPressed: () => _tagChoice(-1),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.all(3),
-                            backgroundColor: sc.baseColor,
-                            side: BorderSide(
-                              color: (_tagSelect == -1)? sc.subColor! : sc.baseColor!,
-                              width: 3
-                            )
-                          ),
-                          child: Container(
-                            width: double.infinity,
-                            child: Column(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.bookmark,
-                                  color: Colors.white,
-                                  size: 50,
-                                ),
-                                Container(
-                                  child: Text(
-                                    'その他',
-                                    textAlign: TextAlign.center,
-                                  )
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Sb('h', 5),
-
                         Container(
-                          height: 450,
+                          height: 416,
                           // height: MediaQuery.of(context).size.height,
                           child: FutureBuilder(
                             future: initialize(),
