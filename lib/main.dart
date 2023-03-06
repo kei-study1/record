@@ -55,7 +55,7 @@ class _MainPageState extends State<MainPage> {
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(icon: const Icon(Icons.edit), backgroundColor: screenColor.baseColor, label: 'RECORD'),
               BottomNavigationBarItem(icon: const Icon(Icons.list), backgroundColor: screenColor.baseColor, label: 'LIST'),
-              BottomNavigationBarItem(icon: const Icon(Icons.chat), backgroundColor: screenColor.baseColor, label: 'Chat'),
+              BottomNavigationBarItem(icon: const Icon(Icons.equalizer), backgroundColor: screenColor.baseColor, label: 'GRAPH'),
             ],
             currentIndex: _currentIndex,
             fixedColor: screenColor.subColor,

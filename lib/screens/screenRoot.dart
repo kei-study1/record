@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:record/screens/recordList.dart';
-import 'package:record/screens/nameless2.dart';
 import 'package:record/screens/record.dart';
+import 'package:record/screens/graph.dart';
 
 
 class ScreenRoot extends StatelessWidget {
@@ -16,7 +16,7 @@ class ScreenList {
   List<ScreenRoot> screenLists = [
     Record(),
     RecordList(),
-    Nameless2(),
+    Graph(),
   ];
 }
 
