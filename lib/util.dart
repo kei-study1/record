@@ -98,6 +98,6 @@ class TimerUtil {
   }
 
   String stringDateTimeDate(DateTime d) {
-    return DateFormat('yyyy/MM/dd (E) hh:mm:ss').format(d);
+    return DateFormat('yyyy/MM/dd (E) HH:mm:ss').format(d);
   }
 }
