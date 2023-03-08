@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -281,6 +282,34 @@ class RecordDbTag {
       'year, month, day, hour, minute, second, '
       'endToStartSecond, restSecond '
       'from record r inner join tag t on r.tagId = t.id order by r.id desc'
+    );
+    return List.generate(maps.length, (i) {
+      return RecordDbTag(
+        id: maps[i]['id'],
+        recordText: maps[i]['recordText'],
+        tagText: maps[i]['tagText'],
+        color: maps[i]['color'],
+        year: maps[i]['year'],
+        month: maps[i]['month'],
+        day: maps[i]['day'],
+        hour: maps [i]['hour'],
+        minute: maps[i]['minute'],
+        second: maps[i]['second'],
+        endToStartSecond: maps[i]['endToStartSecond'],
+        restSecond: maps[i]['restSecond'],
+      );
+    });
+  }
+
+  static Future<List<RecordDbTag>> getAllGraphRecord() async {
+
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      'select '
+      'r.id, r.text as recordText, t.text as tagText, color, '
+      'year, month, day, hour, minute, second, '
+      'endToStartSecond, restSecond '
+      'from record r inner join tag t on r.tagId = t.id '
     );
     return List.generate(maps.length, (i) {
       return RecordDbTag(

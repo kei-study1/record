@@ -100,4 +100,12 @@ class TimerUtil {
   String stringDateTimeDate(DateTime d) {
     return DateFormat('yyyy/MM/dd (E) HH:mm:ss').format(d);
   }
+
+  double doubleStartInt(int h, int m, int s) {
+    return h.toDouble() + m.toDouble() / 60 + s.toDouble() / (60 * 60);
+  }
+
+  double doubleEndInt(double start, int sec) {
+    return start + sec / (60 * 60);
+  }
 }
