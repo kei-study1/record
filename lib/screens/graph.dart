@@ -20,28 +20,28 @@ class GraphStateful extends StatefulWidget {
 }
 
 class GraphState extends State<GraphStateful> {
-  final DateTime now = DateTime.now();
-  final DateTime preNow = DateTime.now().add(Duration(days: -6));
+  DateTime now = DateTime.now();
+  // final DateTime preNow = DateTime.now().add(Duration(days: -6));
+  late DateTime preNow = now.add(Duration(days: -6));
   int _plusDay = 0;
   // ScreenColor
   ScreenColor sc = ScreenColor();
 
   void previous() {
     setState(() {
-      _plusDay -= 1;
+      _plusDay -= 7;
     });
     graphSet();
   }
   void next() {
     setState(() {
-      _plusDay += 1;
+      _plusDay += 7;
     });
     graphSet();
   }
 
   Widget bottomTitles(double value, TitleMeta meta) {
-    var style = TextStyle(fontSize: 10, color: Colors.white);
-    int day;
+    DateTime? date;
     /*
     valueの値とxIntの値が対応しているっぽいので
     xIntの表示順にcase句を並び替えた。
@@ -49,33 +49,57 @@ class GraphState extends State<GraphStateful> {
     */
     switch (value.toInt()) {
       case 0:
-        day = preNow.add(Duration(days: _plusDay)).day;
+        date= preNow.add(Duration(days: _plusDay));
         break;
       case 1:
-        day = preNow.add(Duration(days: 1 + _plusDay)).day;
+        date = preNow.add(Duration(days: 1 + _plusDay));
         break;
       case 2:
-        day = preNow.add(Duration(days: 2 + _plusDay)).day;
+        date = preNow.add(Duration(days: 2 + _plusDay));
         break;
       case 3:
-        day = preNow.add(Duration(days: 3 + _plusDay)).day;
+        date = preNow.add(Duration(days: 3 + _plusDay));
         break;
       case 4:
-        day = preNow.add(Duration(days: 4 + _plusDay)).day;
+        date = preNow.add(Duration(days: 4 + _plusDay));
         break;
       case 5:
-        day = preNow.add(Duration(days: 5 + _plusDay)).day;
+        date = preNow.add(Duration(days: 5 + _plusDay));
         break;
       case 6:
-        day = preNow.add(Duration(days: 6 + _plusDay)).day;
+        date = preNow.add(Duration(days: 6 + _plusDay));
         break;
       default:
-        day = 0;
+        date = null;
         break;
     }
+    // 曜日
+    int weekday = date!.weekday;
+    Color color = Colors.transparent;
+    if (weekday == 6) {
+      color = Colors.blue;
+    }
+    if (weekday == 7) {
+      color = Colors.red;
+    }
+
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      child: Text('$day', style: style),
+      child: Container(
+        alignment: Alignment.center,
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
+        ),
+        child: Text('${date!.day}',
+          style: TextStyle(
+            fontSize: 10,
+            color: Colors.white
+          ),
+        ),
+      ),
     );
   }
 
@@ -101,6 +125,33 @@ class GraphState extends State<GraphStateful> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: previous,
+              child: Icon(Icons.navigate_before),
+            ),
+            Card(
+              color: sc.baseColor,
+              child: Text(
+                tu.stringDateTimeGraphDate(preNow.add(Duration(days: _plusDay)))
+                + ' ~ ' +
+                tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay))),
+                style:  TextStyle(
+                  fontSize: 13,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: next,
+              child: Icon(Icons.navigate_next),
+            ),
+          ],
+        ),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
               onPressed: previous,
@@ -163,7 +214,7 @@ class GraphState extends State<GraphStateful> {
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
-                            reservedSize: 28,
+                            reservedSize: 35, //28
                             getTitlesWidget: bottomTitles,
                           ),
                         ),
@@ -234,6 +285,9 @@ class GraphState extends State<GraphStateful> {
   List<BarChartGroupData> barChartGroupDate = [];
 
   void graphSet() async {
+    // 日付が変わった時用にnowを初期値に戻す。
+    now = DateTime.now();
+    preNow = now.add(Duration(days: -6));
     // 前回データを削除（1週間の日にち）
     week = [];
     // 今回分の1週間前までの日にちをセット
@@ -247,11 +301,12 @@ class GraphState extends State<GraphStateful> {
       RecordDbTag? rdt = null;
       for (int j = 0; j < week.length; j++) {
         List<RecordDbTag> list = [];
+        // 昨日の日付からデータが渡ったらlistの初めに入れて、rdtをnullにする。
+        if (rdt != null) {
+          list.add(rdt);
+          rdt = null;
+        }
         for (int i = 0; i < recordTags.length; i++) {
-          if (rdt != null) {
-            list.add(rdt);
-            rdt = null;
-          }
           DateTime d = tu.datetimeIntDate(recordTags[i].year, recordTags[i].month, recordTags[i].day, 0, 0, 0);
           if (d.year == week[j].year && d.month == week[j].month && d.day == week[j].day) {
             // 24時間対応
@@ -264,6 +319,7 @@ class GraphState extends State<GraphStateful> {
               list.add(
                 RecordDbTag(id: rt.id, recordText: rt.recordText, tagText: rt.tagText, color: rt.color, year: rt.year, month: rt.month, day: rt.day, hour: rt.hour, minute: rt.minute, second: rt.second, endToStartSecond: (24*60*60 - (start*60*60).toInt()), restSecond: rt.restSecond)
               );
+              // 24時を超えたデータ
               rdt = RecordDbTag(id: rt.id, recordText: rt.recordText, tagText: rt.tagText, color: rt.color, year: rt.year, month: rt.month, day: rt.day, hour: 0, minute: 0, second: 0, endToStartSecond: ((end*60*60).toInt() - 24*60*60), restSecond: rt.restSecond);
             }
           }
