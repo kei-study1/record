@@ -127,396 +127,442 @@ class GraphState extends State<GraphStateful> {
     int workSecond = tu.intListRecordDbTag(oneDayList, true);
     int restSecond = tu.intListRecordDbTag(oneDayList, false);
 
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, dialogState) {
-          return SimpleDialog(
-            contentPadding: EdgeInsets.all(10),
-            backgroundColor: sc.baseColor,
-            children: <Widget>[
-              
-              Text('${tu.stringDateTimeGraphDate(week[rodIndex])}'),
-              Icon(Icons.history, color: Colors.white,),
-              // Sb('w', 5),
-              ListText1(
-                tu.stringDateTime(
-                  tu.dateTimeIntSeconds(workSecond)
+            return SimpleDialog(
+              contentPadding: EdgeInsets.all(10),
+              backgroundColor: sc.baseColor,
+              children: <Widget>[
+
+                Text(
+                  '${tu.stringDateTimeGraphDateE(week[rodIndex])}',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20
+                  )
                 ),
-                17
-              ),
-              // Sb('w', 10),
-              Icon(Icons.hourglass_bottom_outlined, color: Colors.white,),
-              // Sb('w', 5),
-              ListText1(
-                tu.stringDateTime(
-                  tu.dateTimeIntSeconds(restSecond)
+                Sb('h', 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(Icons.history, color: Colors.white,),
+                    Sb('w', 5),
+                    ListText1(
+                      tu.stringDateTime(
+                        tu.dateTimeIntSeconds(workSecond)
+                      ),
+                      20
+                    ),
+                    Sb('W', 10),
+                    Icon(Icons.hourglass_bottom_outlined, color: Colors.white,),
+                    Sb('w', 5),
+                    ListText1(
+                      tu.stringDateTime(
+                        tu.dateTimeIntSeconds(restSecond)
+                      ),
+                      20
+                    ),
+                  ],
                 ),
-                17
-              ),
 
+                Sb('h', 10),
 
-
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 300,
-                    height: 480,
-                    child: ListView.builder(
-                      itemCount: dayList[week[rodIndex].day]!.length,
-                      itemBuilder: (context3, index) {
-                    return Card(
-                      color: Color(oneDayList[index].color),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: sc.baseColor,
-                            // backgroundColor: Color(oneDayList[index].color),
-                            minimumSize: Size.zero,
-                            padding: EdgeInsets.all(5),
-                          ),
-                          onPressed: (){},
-        
-                          onLongPress: () {
-                            showDialog(
-                              context: context3,
-                              builder: (BuildContext contextS) {
-                                return SimpleDialog(
-                                  contentPadding: EdgeInsets.all(20),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 300,
+                      height: 400,
+                      child: ListView.builder(
+                        itemCount: dayList[week[rodIndex].day]!.length,
+                        itemBuilder: (context3, index) {
+                          return Card(
+                            color: Color(oneDayList[index].color),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
                                   backgroundColor: sc.baseColor,
-                                  children: <Widget>[
-                                    Container(
-                                      child: SingleChildScrollView(
-                                        child: Text(
-                                          '選択したリストを\n削除しますか？',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.white
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SimpleDialogOption(
-                                      onPressed: () async {
-                                        await RecordDb.deleteRecordList(oneDayList[index].id!);
-                                        // final List<RecordDbTag> recordTagsDb = await RecordDbTag.getAllRecordDbTag();
-                                        dialogState(() {
-                                          oneDayList.removeAt(index);
-                                          oneDayList = oneDayList;
-                                          graphSet();
-                                        });
-                                        Navigator.pop(contextS);
-                                        // Navigator.pop(context);
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          Text('YES', style: TextStyle(color: Colors.white, fontSize: 20),),
-                                        ],
-                                      ),
-                                    ),
-                                    SimpleDialogOption(
-                                      onPressed: () {
-                                        Navigator.pop(contextS);
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          Text('NO', style: TextStyle(color: Colors.white, fontSize: 20),),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                            
-                          child: Container(
-                      
-                                          
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Container(
-                                      width: double.infinity,
-                                      child: ListText2(
-                                        tu.stringDateTimeDate(
-                                          tu.datetimeIntDate(
-                                            oneDayList[index].year,
-                                            oneDayList[index].month,
-                                            oneDayList[index].day,
-                                            oneDayList[index].hour,
-                                            oneDayList[index].minute,
-                                            oneDayList[index].second,
-                                          )
-                                        ),
-                                        13
-                                      ),
-                                    ),
-                                
-                                    Container(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                  minimumSize: Size.zero,
+                                  padding: EdgeInsets.all(5),
+                                ),
+                                onPressed: null,
+                                onLongPress: () {
+                                  showDialog(
+                                    context: context3,
+                                    builder: (BuildContext contextS) {
+                                      return SimpleDialog(
+                                        contentPadding: EdgeInsets.all(20),
+                                        backgroundColor: sc.baseColor,
                                         children: <Widget>[
-                                          ListText1(oneDayList[index].tagText, 20),
-                                          Row(
-                                            children: <Widget>[
-                                              Icon(Icons.history, color: Colors.white,),
-                                              Sb('w', 5),
-                                              ListText1(
-                                                tu.stringDateTime(
-                                                  tu.dateTimeIntSeconds(oneDayList[index].endToStartSecond)
-                                                ),
-                                                17
-                                              ),
-                                              Sb('w', 10),
-                                              Icon(Icons.hourglass_bottom_outlined, color: Colors.white,),
-                                              Sb('w', 5),
-                                              ListText1(
-                                                tu.stringDateTime(
-                                                  tu.dateTimeIntSeconds(oneDayList[index].restSecond)
-                                                ),
-                                                17
-                                              )
-                                            ],
-                                          ),
                                           Container(
-                                            width: 90,
-                                            child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                // minimumSize: Size.zero,
-                                                backgroundColor: Colors.white,
-                                                padding: EdgeInsets.all(0)
+                                            child: SingleChildScrollView(
+                                              child: Text(
+                                                '選択したリストを\n削除しますか？',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white
+                                                ),
                                               ),
-                                              onPressed: (){
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (BuildContext context) {
-                                                    return SimpleDialog(
-                                                      contentPadding: EdgeInsets.all(20),
-                                                      backgroundColor: sc.baseColor,
-                                                      children: <Widget>[
-                                                        Container(
-                                                          height: 300,
-                                                          child: SingleChildScrollView(
-                                                            child: Text(
-                                                              oneDayList[index].recordText,
-                                                              style: TextStyle(
-                                                                fontSize: 20,
-                                                                color: Colors.white
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  }
-                                                );
-                                              }
-                                              ,
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Icon(Icons.article, color: sc.baseColor,),
-                                                  Sb('w', 5),
-                                                  Text(
-                                                    'memo',
-                                                    style: TextStyle(
-                                                      color: sc.baseColor,
-                                                      fontSize: 18
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
+                                            ),
+                                          ),
+                                          SimpleDialogOption(
+                                            onPressed: () async {
+                                              await RecordDb.deleteRecordList(oneDayList[index].id!);
+                                              dialogState(() {
+                                                oneDayList.removeAt(index);
+                                                oneDayList = oneDayList;
+                                                workSecond = tu.intListRecordDbTag(oneDayList, true);
+                                                restSecond = tu.intListRecordDbTag(oneDayList, false);
+                                                graphSet();
+                                              });
+                                              Navigator.pop(contextS);
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                Text('YES', style: TextStyle(color: Colors.white, fontSize: 20),),
+                                              ],
+                                            ),
+                                          ),
+                                          SimpleDialogOption(
+                                            onPressed: () {
+                                              Navigator.pop(contextS);
+                                            },
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                Text('NO', style: TextStyle(color: Colors.white, fontSize: 20),),
+                                              ],
                                             ),
                                           ),
                                         ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                            
-                          ),
-                        ),
-                      ),
-                    );
+                                      );
+                                    },
+                                  );
                                 },
+                            
+                                child: Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        width: double.infinity,
+                                        child: ListText2(
+                                          tu.stringDateTimeDate(
+                                            tu.datetimeIntDate(
+                                              oneDayList[index].year,
+                                              oneDayList[index].month,
+                                              oneDayList[index].day,
+                                              oneDayList[index].hour,
+                                              oneDayList[index].minute,
+                                              oneDayList[index].second,
+                                            )
+                                          ),
+                                          13
+                                        ),
+                                      ),
+
+                                      Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            ListText1(oneDayList[index].tagText, 20),
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(Icons.history, color: Colors.white,),
+                                                Sb('w', 5),
+                                                ListText1(
+                                                  tu.stringDateTime(
+                                                    tu.dateTimeIntSeconds(oneDayList[index].endToStartSecond)
+                                                  ),
+                                                  17
+                                                ),
+                                                Sb('w', 10),
+                                                Icon(Icons.hourglass_bottom_outlined, color: Colors.white,),
+                                                Sb('w', 5),
+                                                ListText1(
+                                                  tu.stringDateTime(
+                                                    tu.dateTimeIntSeconds(oneDayList[index].restSecond)
+                                                  ),
+                                                  17
+                                                )
+                                              ],
+                                            ),
+
+                                            Container(
+                                              width: 90,
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  // minimumSize: Size.zero,
+                                                  backgroundColor: Colors.white,
+                                                  padding: EdgeInsets.all(0)
+                                                ),
+                                                onPressed: (){
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (BuildContext context) {
+                                                      return SimpleDialog(
+                                                        contentPadding: EdgeInsets.all(20),
+                                                        backgroundColor: sc.baseColor,
+                                                        children: <Widget>[
+                                                          Container(
+                                                            height: 300,
+                                                            child: SingleChildScrollView(
+                                                              child: Text(
+                                                                oneDayList[index].recordText,
+                                                                style: TextStyle(
+                                                                  fontSize: 20,
+                                                                  color: Colors.white
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }
+                                                  );
+                                                },
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Icon(Icons.article, color: sc.baseColor,),
+                                                    Sb('w', 5),
+                                                    Text(
+                                                      'memo',
+                                                      style: TextStyle(
+                                                        color: sc.baseColor,
+                                                        fontSize: 18
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                  ),
-                ],
-              ),
-            ],
-          
-          );
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
           }
         );
       }
     );
   }
 
-
-
-
-
-
-
-
+// Widget build ***********************************************
+// Widget build ***********************************************
+// Widget build ***********************************************
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: sc.baseColor
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Container(
+            height: 50,
+          ),
+    
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: sc.baseColor
+                ),
+                onPressed: previous,
+                child: Icon(Icons.navigate_before),
               ),
-              onPressed: previous,
-              child: Icon(Icons.navigate_before),
-            ),
-            Card(
-              color: sc.baseColor,
-              child: Container(
-                alignment: Alignment.center,
-                height: 30,
-                width: 170,
-                child: Text(
-                  tu.stringDateTimeGraphDate(preNow.add(Duration(days: _plusDay)))
-                  + ' ~ ' +
-                  tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay))),
-                  style:  TextStyle(
-                    fontSize: 13,
-                    color: Colors.white,
+              Card(
+                color: sc.baseColor,
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 30,
+                  width: 170,
+                  child: Text(
+                    tu.stringDateTimeGraphDate(preNow.add(Duration(days: _plusDay)))
+                    + ' ~ ' +
+                    tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay))),
+                    style:  TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: sc.baseColor
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: sc.baseColor
+                ),
+                onPressed: next,
+                child: Icon(Icons.navigate_next),
               ),
-              onPressed: next,
-              child: Icon(Icons.navigate_next),
-            ),
-          ],
-        ),
-
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     ElevatedButton(
-        //       onPressed: previous,
-        //       child: Text('前へ'),
-        //     ),
-        //     ElevatedButton(
-        //       onPressed: graphSet,
-        //       child: Text('ボタン'),
-        //     ),
-        //     ElevatedButton(
-        //       onPressed: next,
-        //       child: Text('次へ'),
-        //     ),
-        //   ],
-        // ),
-
-        Container(
-          margin: EdgeInsets.all(10),
-          color: sc.baseColor,
-          child: AspectRatio(
-            aspectRatio: 0.8,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 16, right: 30),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final barsSpace = 4.0 * constraints.maxWidth / 100;
-                  final barsWidth = 8.0 * constraints.maxWidth / 100;
-                  return BarChart(
-                    BarChartData(
-                      maxY: 25,
-                      alignment: BarChartAlignment.center,
-                      barTouchData: BarTouchData(
-                        // 基本的にはtrueにすると、トップの値が分かる
-                        enabled: false,
-                        // touchTooltipData: BarTouchTooltipData(),
-                        touchCallback: (FlTouchEvent event, barTouchResponse) {
-                          if(!event.isInterestedForInteractions ||
-                              barTouchResponse == null ||
-                              barTouchResponse.spot == null) {
-                            return;
-                          }
-                          /*
-                          touchedBarGroupIndex bottomTitleのvalue単位
-                          touchedRodDataIndex 上のindexの中身単位
-                          touchedStackItemIndex 縦軸のデータ単位（値がないところは-1）
-                          */
-                          final rodIndex = barTouchResponse.spot!.touchedBarGroupIndex;
-                          final itemIndex = barTouchResponse.spot!.touchedStackItemIndex;
-                          if (itemIndex == -1) {
-                            return;
-                          }
-                          setState(() {
-                            singleFunctionFlg = !singleFunctionFlg;
-                            if (singleFunctionFlg) {
-                              return graphDialog(context, rodIndex + 1);
+            ],
+          ),
+    
+          Container(
+            margin: EdgeInsets.only(left: 5, right: 5),
+            color: sc.baseColor,
+            child: AspectRatio(
+              aspectRatio: 1.1,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16, right: 30),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final barsSpace = 4.0 * constraints.maxWidth / 100;
+                    final barsWidth = 8.0 * constraints.maxWidth / 100;
+                    return BarChart(
+                      BarChartData(
+                        minY: 0,
+                        maxY: 25,
+                        alignment: BarChartAlignment.center,
+                        barTouchData: BarTouchData(
+                          // 基本的にはtrueにすると、トップの値が分かる
+                          enabled: false,
+                          // touchTooltipData: BarTouchTooltipData(),
+                          touchCallback: (FlTouchEvent event, barTouchResponse) {
+                            if(!event.isInterestedForInteractions ||
+                                barTouchResponse == null ||
+                                barTouchResponse.spot == null) {
+                              return;
                             }
-                          });
-                        }, 
-                      ),
-                      titlesData: FlTitlesData(
-                        // タイトルがtureだと見える
-                        show: true,
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 35, //28
-                            getTitlesWidget: bottomTitles,
+                            /*
+                            touchedBarGroupIndex bottomTitleのvalue単位
+                            touchedRodDataIndex 上のindexの中身単位
+                            touchedStackItemIndex 縦軸のデータ単位（値がないところは-1）
+                            */
+                            final rodIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+                            final itemIndex = barTouchResponse.spot!.touchedStackItemIndex;
+                            if (itemIndex == -1) {
+                              return;
+                            }
+                            setState(() {
+                              singleFunctionFlg = !singleFunctionFlg;
+                              if (singleFunctionFlg) {
+                                return graphDialog(context, rodIndex + 1);
+                              }
+                            });
+                          }, 
+                        ),
+                        titlesData: FlTitlesData(
+                          // タイトルがtureだと見える
+                          show: true,
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 35, //28
+                              getTitlesWidget: bottomTitles,
+                            ),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 40,
+                              interval: 2,
+                              getTitlesWidget: leftTitles,
+                            ),
+                          ),
+                          topTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          rightTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
                           ),
                         ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 40,
-                            getTitlesWidget: leftTitles,
+                        gridData: FlGridData(
+                          // メモリ線がみえる
+                          show: true,
+                          horizontalInterval: 2,
+                          // checkToShowHorizontalLine: (value) => value % 2 == 0,
+                          // checkToShowHorizontalLine: (value) => true,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: sc.subColor,
+                            strokeWidth: 1,
                           ),
+                          // 縦のメモリ線
+                          drawVerticalLine: false,
                         ),
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
+                        borderData: FlBorderData(
+                          // グラフの枠
+                          show: false,
                         ),
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
+                        groupsSpace: barsSpace,
+                        barGroups: getData(barsWidth, barsSpace),
                       ),
-                      gridData: FlGridData(
-                        // メモリ線がみえる
-                        show: true,
-                        checkToShowHorizontalLine: (value) => value % 2 == 0,
-                        getDrawingHorizontalLine: (value) => FlLine(
-                          color: sc.subColor,
-                          strokeWidth: 1,
-                        ),
-                        // 縦のメモリ線
-                        drawVerticalLine: false,
-                      ),
-                      borderData: FlBorderData(
-                        // グラフの枠
-                        show: false,
-                      ),
-                      groupsSpace: barsSpace,
-                      barGroups: getData(barsWidth, barsSpace),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
-      ],
+    
+          Container(
+            width: double.infinity,
+            height: 132,
+            margin: EdgeInsets.only(left: 5, top: 5, right: 5),
+            color: sc.baseColor,
+            child: ListView.builder(
+              itemCount: tagDetailList.length,
+              itemBuilder: (context4, index) {
+                return Container(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(width: 1, color: sc.baseColor3!))
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.bookmark, color: Color(tagDetailList[index].color), size: 40,),
+                      Sb('w', 5),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListText1(tagDetailList[index].tagText, 15),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.history, color: Colors.white, size: 20,),
+                              Sb('w', 5),
+                              ListText1(
+                                tu.stringDateTime(
+                                  tu.dateTimeIntSeconds(tagDetailList[index].endToStartSecond)
+                                ),
+                                12
+                              ),
+                              Sb('w', 10),
+                              Icon(Icons.hourglass_bottom_outlined, color: Colors.white, size: 20,),
+                              Sb('w', 5),
+                              ListText1(
+                                tu.stringDateTime(
+                                  tu.dateTimeIntSeconds(tagDetailList[index].restSecond)
+                                ),
+                                12
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          )
+    
+        ],
+      ),
     );
   }
 
@@ -548,6 +594,8 @@ class GraphState extends State<GraphStateful> {
   Map<int, List<RecordDbTag>> dayList = {};
   // 日付とデータが結びついているグラフ用データリスト
   List<BarChartGroupData> barChartGroupDate = [];
+  // グラフ下部のTag表示用
+  List<RecordDbTag> tagDetailList = [];
 
   void graphSet() async {
     // 日付が変わった時用にnowを初期値に戻す。
@@ -557,9 +605,10 @@ class GraphState extends State<GraphStateful> {
     week = [];
     // 今回分の1週間前までの日にちをセット
     weekPutDay();
-    // 前回データの削除（dayList, barChartGroupDate）
+    // 前回データの削除（dayList, barChartGroupDate, tagDetailList）
     dayList = {};
     barChartGroupDate = [];
+    tagDetailList = [];
     recordTags = await RecordDbTag.getAllGraphRecord();
     setState(() {
       // グラフに表示する各データを日付ごとに格納
@@ -592,6 +641,7 @@ class GraphState extends State<GraphStateful> {
         dayList[week[j].day] = list;
       }
 
+
       // グラフに表示するデータをRodグラフに表示用にセット
       for (int j = 1; j < week.length; j++) {
         List<BarChartRodStackItem> rodStackItems = [];
@@ -606,6 +656,28 @@ class GraphState extends State<GraphStateful> {
         // barChartGroupDate.add(MakeBarChartGroupData(week[j].day, rodStackItems));
         barChartGroupDate.add(MakeBarChartGroupData(j - 1, rodStackItems));
       }
+
+      // グラフ下部Tag表示用
+      for (int j = 1; j < week.length; j++) {
+        for (int i = 0; i < dayList[week[j].day]!.length; i++) {
+          RecordDbTag rt1 = dayList[week[j].day]![i];
+          bool flg = true;
+          for (int k = 0; k < tagDetailList.length; k++) {
+            RecordDbTag rt2 = tagDetailList[k];
+            if (rt1.color == rt2.color && rt1.tagText == rt2.tagText) {
+              rt2.endToStartSecond += rt1.endToStartSecond;
+              rt2.restSecond += rt1.restSecond;
+              flg = false;
+              break;
+            }
+          }
+          if (flg) {
+            tagDetailList.add(rt1);
+          }
+        }
+      }
+      // tagDetailListを作業時間でsort（作業時間の多い順）
+      tagDetailList.sort((a, b) => b.endToStartSecond.compareTo(a.endToStartSecond));
     });
   }
 

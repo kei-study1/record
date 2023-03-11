@@ -236,8 +236,10 @@ class RecordDbTag {
   final int hour;
   final int minute;
   final int second;
-  final int endToStartSecond;
-  final int restSecond;
+  // final int endToStartSecond;
+  int endToStartSecond;
+  // final int restSecond;
+  int restSecond;
 
   RecordDbTag({
     required this.id,

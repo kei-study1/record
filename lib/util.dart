@@ -107,6 +107,10 @@ class TimerUtil {
     return DateFormat('yyyy/MM/dd').format(d);
   }
 
+  String stringDateTimeGraphDateE(DateTime d) {
+    return DateFormat('yyyy/MM/dd (EEEE)').format(d);
+  }
+
   double doubleStartInt(int h, int m, int s) {
     return h.toDouble() + m.toDouble() / 60 + s.toDouble() / (60 * 60);
   }
