@@ -12,16 +12,12 @@ class Graph extends ScreenRoot {
 }
 
 class GraphStateful extends StatefulWidget {
-  final Color dark = Colors.red;
-  final Color normal = Colors.blue;
-  final Color light = Colors.yellow;
   @override
   GraphState createState() => GraphState();
 }
 
 class GraphState extends State<GraphStateful> {
   DateTime now = DateTime.now();
-  // final DateTime preNow = DateTime.now().add(Duration(days: -6));
   late DateTime preNow = now.add(Duration(days: -6));
   int _plusDay = 0;
   // ScreenColor
@@ -120,6 +116,256 @@ class GraphState extends State<GraphStateful> {
     );
   }
 
+
+
+  bool singleFunctionFlg = true;
+
+  void graphDialog(BuildContext context, int rodIndex) {
+    // その日１日分のデータ群
+    List<RecordDbTag> oneDayList = dayList[week[rodIndex].day]!;
+    oneDayList = List.from(oneDayList.reversed);
+    int workSecond = tu.intListRecordDbTag(oneDayList, true);
+    int restSecond = tu.intListRecordDbTag(oneDayList, false);
+
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, dialogState) {
+          return SimpleDialog(
+            contentPadding: EdgeInsets.all(10),
+            backgroundColor: sc.baseColor,
+            children: <Widget>[
+              
+              Text('${tu.stringDateTimeGraphDate(week[rodIndex])}'),
+              Icon(Icons.history, color: Colors.white,),
+              // Sb('w', 5),
+              ListText1(
+                tu.stringDateTime(
+                  tu.dateTimeIntSeconds(workSecond)
+                ),
+                17
+              ),
+              // Sb('w', 10),
+              Icon(Icons.hourglass_bottom_outlined, color: Colors.white,),
+              // Sb('w', 5),
+              ListText1(
+                tu.stringDateTime(
+                  tu.dateTimeIntSeconds(restSecond)
+                ),
+                17
+              ),
+
+
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 300,
+                    height: 480,
+                    child: ListView.builder(
+                      itemCount: dayList[week[rodIndex].day]!.length,
+                      itemBuilder: (context3, index) {
+                    return Card(
+                      color: Color(oneDayList[index].color),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: sc.baseColor,
+                            // backgroundColor: Color(oneDayList[index].color),
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.all(5),
+                          ),
+                          onPressed: (){},
+        
+                          onLongPress: () {
+                            showDialog(
+                              context: context3,
+                              builder: (BuildContext contextS) {
+                                return SimpleDialog(
+                                  contentPadding: EdgeInsets.all(20),
+                                  backgroundColor: sc.baseColor,
+                                  children: <Widget>[
+                                    Container(
+                                      child: SingleChildScrollView(
+                                        child: Text(
+                                          '選択したリストを\n削除しますか？',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.white
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SimpleDialogOption(
+                                      onPressed: () async {
+                                        await RecordDb.deleteRecordList(oneDayList[index].id!);
+                                        // final List<RecordDbTag> recordTagsDb = await RecordDbTag.getAllRecordDbTag();
+                                        dialogState(() {
+                                          oneDayList.removeAt(index);
+                                          oneDayList = oneDayList;
+                                          graphSet();
+                                        });
+                                        Navigator.pop(contextS);
+                                        // Navigator.pop(context);
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Text('YES', style: TextStyle(color: Colors.white, fontSize: 20),),
+                                        ],
+                                      ),
+                                    ),
+                                    SimpleDialogOption(
+                                      onPressed: () {
+                                        Navigator.pop(contextS);
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Text('NO', style: TextStyle(color: Colors.white, fontSize: 20),),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                            
+                          child: Container(
+                      
+                                          
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Container(
+                                      width: double.infinity,
+                                      child: ListText2(
+                                        tu.stringDateTimeDate(
+                                          tu.datetimeIntDate(
+                                            oneDayList[index].year,
+                                            oneDayList[index].month,
+                                            oneDayList[index].day,
+                                            oneDayList[index].hour,
+                                            oneDayList[index].minute,
+                                            oneDayList[index].second,
+                                          )
+                                        ),
+                                        13
+                                      ),
+                                    ),
+                                
+                                    Container(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          ListText1(oneDayList[index].tagText, 20),
+                                          Row(
+                                            children: <Widget>[
+                                              Icon(Icons.history, color: Colors.white,),
+                                              Sb('w', 5),
+                                              ListText1(
+                                                tu.stringDateTime(
+                                                  tu.dateTimeIntSeconds(oneDayList[index].endToStartSecond)
+                                                ),
+                                                17
+                                              ),
+                                              Sb('w', 10),
+                                              Icon(Icons.hourglass_bottom_outlined, color: Colors.white,),
+                                              Sb('w', 5),
+                                              ListText1(
+                                                tu.stringDateTime(
+                                                  tu.dateTimeIntSeconds(oneDayList[index].restSecond)
+                                                ),
+                                                17
+                                              )
+                                            ],
+                                          ),
+                                          Container(
+                                            width: 90,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                // minimumSize: Size.zero,
+                                                backgroundColor: Colors.white,
+                                                padding: EdgeInsets.all(0)
+                                              ),
+                                              onPressed: (){
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return SimpleDialog(
+                                                      contentPadding: EdgeInsets.all(20),
+                                                      backgroundColor: sc.baseColor,
+                                                      children: <Widget>[
+                                                        Container(
+                                                          height: 300,
+                                                          child: SingleChildScrollView(
+                                                            child: Text(
+                                                              oneDayList[index].recordText,
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                color: Colors.white
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
+                                                );
+                                              }
+                                              ,
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Icon(Icons.article, color: sc.baseColor,),
+                                                  Sb('w', 5),
+                                                  Text(
+                                                    'memo',
+                                                    style: TextStyle(
+                                                      color: sc.baseColor,
+                                                      fontSize: 18
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            
+                          ),
+                        ),
+                      ),
+                    );
+                                },
+                              ),
+                  ),
+                ],
+              ),
+            ],
+          
+          );
+          }
+        );
+      }
+    );
+  }
+
+
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -128,45 +374,56 @@ class GraphState extends State<GraphStateful> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: sc.baseColor
+              ),
               onPressed: previous,
               child: Icon(Icons.navigate_before),
             ),
             Card(
               color: sc.baseColor,
-              child: Text(
-                tu.stringDateTimeGraphDate(preNow.add(Duration(days: _plusDay)))
-                + ' ~ ' +
-                tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay))),
-                style:  TextStyle(
-                  fontSize: 13,
-                  color: Colors.white,
+              child: Container(
+                alignment: Alignment.center,
+                height: 30,
+                width: 170,
+                child: Text(
+                  tu.stringDateTimeGraphDate(preNow.add(Duration(days: _plusDay)))
+                  + ' ~ ' +
+                  tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay))),
+                  style:  TextStyle(
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: sc.baseColor
+              ),
               onPressed: next,
               child: Icon(Icons.navigate_next),
             ),
           ],
         ),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: previous,
-              child: Text('前へ'),
-            ),
-            ElevatedButton(
-              onPressed: graphSet,
-              child: Text('ボタン'),
-            ),
-            ElevatedButton(
-              onPressed: next,
-              child: Text('次へ'),
-            ),
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     ElevatedButton(
+        //       onPressed: previous,
+        //       child: Text('前へ'),
+        //     ),
+        //     ElevatedButton(
+        //       onPressed: graphSet,
+        //       child: Text('ボタン'),
+        //     ),
+        //     ElevatedButton(
+        //       onPressed: next,
+        //       child: Text('次へ'),
+        //     ),
+        //   ],
+        // ),
 
         Container(
           margin: EdgeInsets.all(10),
@@ -199,12 +456,15 @@ class GraphState extends State<GraphStateful> {
                           touchedStackItemIndex 縦軸のデータ単位（値がないところは-1）
                           */
                           final rodIndex = barTouchResponse.spot!.touchedBarGroupIndex;
+                          final itemIndex = barTouchResponse.spot!.touchedStackItemIndex;
+                          if (itemIndex == -1) {
+                            return;
+                          }
                           setState(() {
-                            print('start=========================');
-                            print(rodIndex);
-                            print(barTouchResponse.spot!.touchedRodDataIndex);
-                            print(barTouchResponse.spot!.touchedStackItemIndex);
-                            print('end=========================');
+                            singleFunctionFlg = !singleFunctionFlg;
+                            if (singleFunctionFlg) {
+                              return graphDialog(context, rodIndex + 1);
+                            }
                           });
                         }, 
                       ),
@@ -259,6 +519,11 @@ class GraphState extends State<GraphStateful> {
       ],
     );
   }
+
+
+  // ===============================================================
+  // ===============================================================
+  // ===============================================================
 
   // 以下グラフ作成用
   double _barsWidth = 0;
@@ -369,6 +634,11 @@ class GraphState extends State<GraphStateful> {
     return BarChartRodStackItem(start, end, Color(color));
   }
   
+  // ===============================================================
+  // ===============================================================
+  // ===============================================================
+
+
 
   // BarChartRodData MakeBarChartRodData(List<BarChartRodStackItem> rodStackItems) {
   //   return BarChartRodData(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'db.dart';
+
 // 行間空け用
 Widget Sb(String w, double s) {
   return SizedBox(
@@ -111,5 +113,17 @@ class TimerUtil {
 
   double doubleEndInt(double start, int sec) {
     return start + sec / (60 * 60);
+  }
+
+  int intListRecordDbTag (List<RecordDbTag> list, bool b) {
+    int sum = 0;
+    for (int i = 0; i < list.length; i++) {
+      if (b) {
+        sum += list[i].endToStartSecond;
+      } else {
+        sum += list[i].restSecond;
+      }
+    }
+    return sum;
   }
 }
