@@ -111,6 +111,11 @@ class TimerUtil {
     return DateFormat('yyyy/MM/dd (EEEE)').format(d);
   }
 
+  String stringDateTimeGraphDateMonth(DateTime d, int plusMonth) {
+    DateTime d2 = DateTime(d.year, d.month + plusMonth);
+    return DateFormat('yyyy/MM').format(d2);
+  } 
+
   double doubleStartInt(int h, int m, int s) {
     return h.toDouble() + m.toDouble() / 60 + s.toDouble() / (60 * 60);
   }

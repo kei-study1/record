@@ -3,6 +3,8 @@ import '../db.dart';
 import '../util.dart';
 import 'screenRoot.dart';
 import 'package:fl_chart/fl_chart.dart';
+// toggle button
+
 
 class Graph extends ScreenRoot {
   @override
@@ -20,18 +22,34 @@ class GraphState extends State<GraphStateful> {
   DateTime now = DateTime.now();
   late DateTime preNow = now.add(Duration(days: -6));
   int _plusDay = 0;
+  int _plusMonth = 0;
   // ScreenColor
   ScreenColor sc = ScreenColor();
 
+  @override
+  void initState() {
+    graphSet();
+  }
+
   void previous() {
     setState(() {
-      _plusDay -= 7;
+      if (_toggleList[0]) {
+        _plusDay -= 7;
+      }
+      if (_toggleList[1]) {
+        _plusMonth -= 1;
+      }
     });
     graphSet();
   }
   void next() {
     setState(() {
-      _plusDay += 7;
+      if (_toggleList[0]) {
+        _plusDay += 7;
+      }
+      if (_toggleList[1]) {
+        _plusMonth += 1;
+      }
     });
     graphSet();
   }
@@ -43,32 +61,145 @@ class GraphState extends State<GraphStateful> {
     xIntの表示順にcase句を並び替えた。
     caseにはconst値しか使えないっぽいため。
     */
-    switch (value.toInt()) {
-      case 0:
-        date= preNow.add(Duration(days: _plusDay));
-        break;
-      case 1:
-        date = preNow.add(Duration(days: 1 + _plusDay));
-        break;
-      case 2:
-        date = preNow.add(Duration(days: 2 + _plusDay));
-        break;
-      case 3:
-        date = preNow.add(Duration(days: 3 + _plusDay));
-        break;
-      case 4:
-        date = preNow.add(Duration(days: 4 + _plusDay));
-        break;
-      case 5:
-        date = preNow.add(Duration(days: 5 + _plusDay));
-        break;
-      case 6:
-        date = preNow.add(Duration(days: 6 + _plusDay));
-        break;
-      default:
-        date = null;
-        break;
+    if (_toggleList[0]){
+      switch (value.toInt()) {
+        case 0:
+          date= preNow.add(Duration(days: _plusDay));
+          break;
+        case 1:
+          date = preNow.add(Duration(days: 1 + _plusDay));
+          break;
+        case 2:
+          date = preNow.add(Duration(days: 2 + _plusDay));
+          break;
+        case 3:
+          date = preNow.add(Duration(days: 3 + _plusDay));
+          break;
+        case 4:
+          date = preNow.add(Duration(days: 4 + _plusDay));
+          break;
+        case 5:
+          date = preNow.add(Duration(days: 5 + _plusDay));
+          break;
+        case 6:
+          date = preNow.add(Duration(days: 6 + _plusDay));
+          break;
+        default:
+          date = null;
+          break;
+      }
     }
+
+    if (_toggleList[1]) {
+      switch (value.toInt()) {
+        case 0:
+          date = DateTime(now.year, now.month + _plusMonth, 1);
+          break;
+        case 1:
+          date = DateTime(now.year, now.month + _plusMonth, 2);
+          break;
+        case 2:
+          date = DateTime(now.year, now.month + _plusMonth, 3);
+          break;
+        case 3:
+          date = DateTime(now.year, now.month + _plusMonth, 4);
+          break;
+        case 4:
+          date = DateTime(now.year, now.month + _plusMonth, 5);
+          break;
+        case 5:
+          date = DateTime(now.year, now.month + _plusMonth, 6);
+          break;
+        case 6:
+          date = DateTime(now.year, now.month + _plusMonth, 7);
+          break;
+        case 7:
+          date = DateTime(now.year, now.month + _plusMonth, 8);
+          break;
+        case 8:
+          date = DateTime(now.year, now.month + _plusMonth, 9);
+          break;
+        case 9:
+          date = DateTime(now.year, now.month + _plusMonth, 10);
+          break;
+        case 10:
+          date = DateTime(now.year, now.month + _plusMonth, 11);
+          break;
+        case 11:
+          date = DateTime(now.year, now.month + _plusMonth, 12);
+          break;
+        case 12:
+          date = DateTime(now.year, now.month + _plusMonth, 13);
+          break;
+        case 13:
+          date = DateTime(now.year, now.month + _plusMonth, 14);
+          break;
+        case 14:
+          date = DateTime(now.year, now.month + _plusMonth, 15);
+          break;
+        case 15:
+          date = DateTime(now.year, now.month + _plusMonth, 16);
+          break;
+        case 16:
+          date = DateTime(now.year, now.month + _plusMonth, 17);
+          break;
+        case 17:
+          date = DateTime(now.year, now.month + _plusMonth, 18);
+          break;
+        case 18:
+          date = DateTime(now.year, now.month + _plusMonth, 19);
+          break;
+        case 19:
+          date = DateTime(now.year, now.month + _plusMonth, 20);
+          break;
+        case 20:
+          date = DateTime(now.year, now.month + _plusMonth, 21);
+          break;
+        case 21:
+          date = DateTime(now.year, now.month + _plusMonth, 22);
+          break;
+        case 22:
+          date = DateTime(now.year, now.month + _plusMonth, 23);
+          break;
+        case 23:
+          date = DateTime(now.year, now.month + _plusMonth, 24);
+          break;
+        case 24:
+          date = DateTime(now.year, now.month + _plusMonth, 25);
+          break;
+        case 25:
+          date = DateTime(now.year, now.month + _plusMonth, 26);
+          break;
+        case 26:
+          date = DateTime(now.year, now.month + _plusMonth, 27);
+          break;
+        case 27:
+          date = DateTime(now.year, now.month + _plusMonth, 28);
+          break;
+        case 28:
+          date = DateTime(now.year, now.month + _plusMonth, 29);
+          break;
+        case 29:
+          date = DateTime(now.year, now.month + _plusMonth, 30);
+          break;
+        case 30:
+          date = DateTime(now.year, now.month + _plusMonth, 31);
+          break;
+        default:
+          date = null;
+          break;
+      }
+    }
+
+    int day = date!.day;
+
+    if (_toggleList[1] && day % 2 == 0) {
+      return SideTitleWidget(
+        axisSide: meta.axisSide,
+        child: Text(''),
+      );
+    }
+
     // 曜日
     int weekday = date!.weekday;
     Color color = Colors.transparent;
@@ -89,12 +220,12 @@ class GraphState extends State<GraphStateful> {
           shape: BoxShape.circle,
           color: color,
         ),
-        child: Text('${date!.day}',
+        child: Text('${day}',
           style: TextStyle(
             fontSize: 10,
             color: Colors.white
           ),
-        ),
+        )
       ),
     );
   }
@@ -117,7 +248,7 @@ class GraphState extends State<GraphStateful> {
   }
 
 
-
+  // グラフタッチ時にコールバック関数が何回が動くのでそれの制御用フラグ
   bool singleFunctionFlg = true;
 
   void graphDialog(BuildContext context, int rodIndex) {
@@ -365,6 +496,20 @@ class GraphState extends State<GraphStateful> {
     );
   }
 
+  List<bool> _toggleList = [true, false];
+  // double _constrain = 0;
+  double _constrain = 353;
+  double barsSpace = 0.0;
+  double barsWidth = 0.0;
+
+  final _tab = <Tab> [
+    // Tab( text:'WEEK', icon: Icon(Icons.directions_car)),
+    // Tab( text:'MONTH', icon: Icon(Icons.directions_bike)),
+    Tab( text:'WEEK',),
+    Tab( text:'MONTH',),
+    // Tab( text:'Boat', icon: Icon(Icons.directions_boat)),
+  ];
+
 // Widget build ***********************************************
 // Widget build ***********************************************
 // Widget build ***********************************************
@@ -374,9 +519,31 @@ class GraphState extends State<GraphStateful> {
       child: Column(
         children: [
           Container(
-            height: 50,
+            decoration: BoxDecoration(
+              color: sc.baseColor,
+              borderRadius: BorderRadius.circular(5)
+            ),
+            margin: EdgeInsets.only(left: 5, top: 10, right: 5),
+            padding: EdgeInsets.only(left: 20, right: 20),
+            child: DefaultTabController(
+              length: _tab.length,
+              child: TabBar(
+                labelColor: sc.subColor,
+                unselectedLabelColor: Colors.white,
+                indicatorColor: sc.subColor,
+                tabs: _tab,
+                onTap: (index) {
+                  setState(() {
+                    for (int i = 0; i < _toggleList.length; i++){
+                      _toggleList[i] = i == index;
+                    }
+                    graphSet();
+                  });
+                },
+              ),
+            ),
           ),
-    
+
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -391,12 +558,16 @@ class GraphState extends State<GraphStateful> {
                 color: sc.baseColor,
                 child: Container(
                   alignment: Alignment.center,
-                  height: 30,
-                  width: 170,
+                  height: 36,
+                  width: 200,
                   child: Text(
+                    (_toggleList[0])?
                     tu.stringDateTimeGraphDate(preNow.add(Duration(days: _plusDay)))
                     + ' ~ ' +
-                    tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay))),
+                    tu.stringDateTimeGraphDate(now.add(Duration(days: _plusDay)))
+                    :
+                    tu.stringDateTimeGraphDateMonth(now, _plusMonth)
+                    ,
                     style:  TextStyle(
                       fontSize: 13,
                       color: Colors.white,
@@ -415,16 +586,19 @@ class GraphState extends State<GraphStateful> {
           ),
     
           Container(
+            decoration: BoxDecoration(
+              color: sc.baseColor,
+              borderRadius: BorderRadius.circular(5)
+            ),
             margin: EdgeInsets.only(left: 5, right: 5),
-            color: sc.baseColor,
             child: AspectRatio(
               aspectRatio: 1.1,
               child: Padding(
                 padding: const EdgeInsets.only(top: 16, right: 30),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final barsSpace = 4.0 * constraints.maxWidth / 100;
-                    final barsWidth = 8.0 * constraints.maxWidth / 100;
+                    // _constrain = constraints.maxWidth;
+
                     return BarChart(
                       BarChartData(
                         minY: 0,
@@ -501,7 +675,7 @@ class GraphState extends State<GraphStateful> {
                           show: false,
                         ),
                         groupsSpace: barsSpace,
-                        barGroups: getData(barsWidth, barsSpace),
+                        barGroups: getData(),
                       ),
                     );
                   },
@@ -511,78 +685,101 @@ class GraphState extends State<GraphStateful> {
           ),
     
           Container(
+            decoration: BoxDecoration(
+              color: sc.baseColor,
+              borderRadius: BorderRadius.circular(5)
+            ),
             width: double.infinity,
             height: 132,
             margin: EdgeInsets.only(left: 5, top: 5, right: 5),
-            color: sc.baseColor,
             child: ListView.builder(
               itemCount: tagDetailList.length,
               itemBuilder: (context4, index) {
-                return Container(
-                  padding: EdgeInsets.only(left: 5, right: 5),
-                  decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(width: 1, color: sc.baseColor3!))
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.bookmark, color: Color(tagDetailList[index].color), size: 40,),
-                      Sb('w', 5),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListText1(tagDetailList[index].tagText, 15),
-                          Row(
-                            children: <Widget>[
-                              Icon(Icons.history, color: Colors.white, size: 20,),
-                              Sb('w', 5),
-                              ListText1(
-                                tu.stringDateTime(
-                                  tu.dateTimeIntSeconds(tagDetailList[index].endToStartSecond)
+                return Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Container(),
+                    ),
+                    Expanded(
+                      flex: 40,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 5, right: 5),
+                        decoration: BoxDecoration(
+                          border: Border(bottom: BorderSide(width: 1, color: sc.baseColor3!)),
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            Icon(Icons.bookmark, color: Color(tagDetailList[index].color), size: 40,),
+                            Sb('w', 5),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                ListText1(tagDetailList[index].tagText, 15),
+                                Row(
+                                  children: <Widget>[
+                                    Icon(Icons.history, color: Colors.white, size: 20,),
+                                    Sb('w', 5),
+                                    ListText1(
+                                      tu.stringDateTime(
+                                        tu.dateTimeIntSeconds(tagDetailList[index].endToStartSecond)
+                                      ),
+                                      12
+                                    ),
+                                    Sb('w', 10),
+                                    Icon(Icons.hourglass_bottom_outlined, color: Colors.white, size: 20,),
+                                    Sb('w', 5),
+                                    ListText1(
+                                      tu.stringDateTime(
+                                        tu.dateTimeIntSeconds(tagDetailList[index].restSecond)
+                                      ),
+                                      12
+                                    )
+                                  ],
                                 ),
-                                12
-                              ),
-                              Sb('w', 10),
-                              Icon(Icons.hourglass_bottom_outlined, color: Colors.white, size: 20,),
-                              Sb('w', 5),
-                              ListText1(
-                                tu.stringDateTime(
-                                  tu.dateTimeIntSeconds(tagDetailList[index].restSecond)
-                                ),
-                                12
-                              )
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(),
+                    ),
+                  ],
                 );
               },
             ),
           )
-    
         ],
       ),
     );
   }
 
 
-  // ===============================================================
-  // ===============================================================
-  // ===============================================================
 
-  // 以下グラフ作成用
-  double _barsWidth = 0;
-  double _barsSpace = 0;
+
+  // ===============================================================
+  // ===============================================================
+  // ===============================================================
 
   // TimerUtilクラス
   TimerUtil tu = TimerUtil();
   // 1週間分の日付が入るリスト・メソッド
   List<DateTime> week = [];
   void weekPutDay() {
-    for(int i = -1; i < 7; i++) {
-      week.add(preNow.add(Duration(days: i + _plusDay)));
+    if (_toggleList[0]) {
+      for(int i = -1; i < 7; i++) {
+        week.add(preNow.add(Duration(days: i + _plusDay)));
+      }
     }
+    if (_toggleList[1]) {
+      for(int i = -1; i < (DateTime(now.year, now.month + _plusMonth + 1, 0).day); i++){
+        week.add(DateTime(now.year, now.month + _plusMonth, i + 1));
+      }
+    }
+
   }
   // 全recordデータ格納リスト
   List<RecordDbTag> recordTags = [];
@@ -598,6 +795,16 @@ class GraphState extends State<GraphStateful> {
   List<RecordDbTag> tagDetailList = [];
 
   void graphSet() async {
+    // 毎回グラフの幅の調節を行う。
+    if (_toggleList[0]) {
+      barsSpace = 4.0 * _constrain / 100;
+      barsWidth = 8.0 * _constrain / 100;
+    }
+    if (_toggleList[1]) {
+      barsSpace = 0.0;
+      barsWidth = 9.5;
+    }
+
     // 日付が変わった時用にnowを初期値に戻す。
     now = DateTime.now();
     preNow = now.add(Duration(days: -6));
@@ -682,22 +889,19 @@ class GraphState extends State<GraphStateful> {
   }
 
   // グラフの形等を指定するクラス群 getDataが一番最初に呼ばれる
-  List<BarChartGroupData> getData(double barsWidth, double barsSpace) {
-    _barsWidth = barsWidth;
-    _barsSpace = barsSpace;
+  List<BarChartGroupData> getData() {
     return barChartGroupDate;
   }
   BarChartGroupData MakeBarChartGroupData(int xInt, List<BarChartRodStackItem> rodStackItems) {
     return BarChartGroupData(
       x: xInt,
-      barsSpace: _barsSpace,
       barRods: [
         BarChartRodData(
           color: Colors.transparent,
           toY: 24,
           rodStackItems: rodStackItems,
           borderRadius: BorderRadius.zero,
-          width: _barsWidth,
+          width: barsWidth,
         ),
       ]
     );
@@ -705,12 +909,12 @@ class GraphState extends State<GraphStateful> {
   BarChartRodStackItem MakeBarChartRodStackItem(double start, double end, int color) {
     return BarChartRodStackItem(start, end, Color(color));
   }
-  
-  // ===============================================================
-  // ===============================================================
-  // ===============================================================
 
 
+
+  // ===============================================================
+  // ===============================================================
+  // ===============================================================
 
   // BarChartRodData MakeBarChartRodData(List<BarChartRodStackItem> rodStackItems) {
   //   return BarChartRodData(
